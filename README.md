@@ -1,2 +1,5 @@
-# web-contact-manager
-Frontend-only solution for a web-contact management app
+# Web Contact Management App 
+Front-end only solution for a web contact manager
+
+# Techstack 
+Vite/Typescript/React/Redux
