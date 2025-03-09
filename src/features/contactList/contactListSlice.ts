@@ -3,12 +3,13 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 // define TS type for data being used
 export interface ContactCard {
+  id: string;
   firstName: string;
   lastName: string;
 }
 
 const initialState: ContactCard[] = [
-  {firstName: 'test', lastName: '1'}
+  {id:'testID', firstName: 'firstName', lastName: 'lastName'}
 ];
 
 export const contactListSlice = createSlice({
@@ -16,7 +17,7 @@ export const contactListSlice = createSlice({
   initialState,
   reducers: {
     contactAdded: (state, action: PayloadAction<ContactCard>) => {
-      state.contactList.push(action.payload);
+      state.push(action.payload);
     },
   },
 });
