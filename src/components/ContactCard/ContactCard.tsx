@@ -1,8 +1,10 @@
 
 export default function ContactCard() {
 	return (
-		<div >
-			name, number, email
+		<div>
+			first name:
+			<br/>
+			last name:
 		</div>
 	)
 }

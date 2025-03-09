@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { update } from '../../features/contactCard/contactCardSlice';
+// import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../app/hooks';
+import { nanoid } from '@reduxjs/toolkit';
+import { contactAdded } from '../../features/contactList/contactListSlice';
 
-interface contactCard {
+interface ContactCard {
   firstName: string;
   lastName: string;
 }
 
-const contactCard: contactCard = {
+const contactCard: ContactCard = {
   firstName: '',
   lastName: '',
 };
@@ -16,8 +18,7 @@ export default function AddContact() {
   const [values, setValues] = useState(contactCard);
   const [visibility, setVisibility] = useState(false);
 
-  // const contactCard = useSelector(());
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -31,10 +32,24 @@ export default function AddContact() {
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('ContactCard ', ContactCard);
-    console.log('values ', values);
 
-    dispatch(update(contactCard));
+    // console.log('e.currentTarget ', e.currentTarget);
+    // console.log('e.currentTarget.elements ', e.currentTarget.elements);
+    // console.log('e.currentTarget.firstName ', e.currentTarget.firstName);
+    // console.log('e.currentTarget.lastName ', e.currentTarget.lastName);
+    
+    const firstName = e.currentTarget.firstName.value;
+    const lastName = e.currentTarget.lastName.value;
+    const newContact: ContactCard = {
+      firstName,
+      lastName,
+    };
+    
+    dispatch(contactAdded(newContact));
+
+    // const newContactList = useSelector()
+
+    e.currentTarget.reset();
 
     setVisibility(false);
   };
