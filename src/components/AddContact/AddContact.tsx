@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
-import { type ContactCard, contactAdded } from '../../features/contactList/contactListSlice';
+import {contactAdded} from '../../redux/slices/contactsSlice';
+import { type ContactCard } from '../../types/contactTypes';
 
 export const AddContact = () => {
-  const initialValues = {firstName: '', lastName: ''};
+  const initialValues = { firstName: '', lastName: '' };
   const [values, setValues] = useState(initialValues);
   const [visibility, setVisibility] = useState(false);
   // get 'dispatch' method from the store
@@ -23,7 +24,7 @@ export const AddContact = () => {
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     // prevent server submission
     e.preventDefault();
-    
+
     const firstName = e.currentTarget.firstName.value;
     const lastName = e.currentTarget.lastName.value;
 
@@ -70,4 +71,4 @@ export const AddContact = () => {
       )}
     </>
   );
-}
+};

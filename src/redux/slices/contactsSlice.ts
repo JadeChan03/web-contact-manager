@@ -1,28 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { type ContactCard } from '../../types/contactTypes';
 
-// define TS type for data being used
-export interface ContactCard {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
+// this file takes care of any actions related to contacts
 
+// initial state of ContactList
 const initialState: ContactCard[] = [
   {id:'testID', firstName: 'firstName', lastName: 'lastName'}
 ];
 
-export const contactListSlice = createSlice({
-  name: 'contactList',
+export const contactsSlice = createSlice({
+  name: 'contacts',
   initialState,
   reducers: {
+    /* 'contacts/contactAdded' */
     contactAdded: (state, action: PayloadAction<ContactCard>) => {
       state.push(action.payload);
     },
+    /* 'contacts/contactDeleted' */
+    /* 'contacts/contactUpdated' */
   },
 });
 
 // Export the generated action creators for use in components
-export const { contactAdded } = contactListSlice.actions;
+export const { contactAdded } = contactsSlice.actions;
 // Export the slice reducer for use in the store configuration
-export default contactListSlice.reducer;
+export default contactsSlice.reducer;
