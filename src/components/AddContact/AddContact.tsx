@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import {contactAdded} from '../../redux/slices/contactsSlice';
-import { type ContactCard } from '../../types/contactTypes';
+import { type Contact } from '../../types/contactTypes';
 
 export const AddContact = () => {
   const initialValues = { firstName: '', lastName: '' };
@@ -29,7 +29,7 @@ export const AddContact = () => {
     const lastName = e.currentTarget.lastName.value;
 
     // create contact card object and dispatch 'contactAdded' action
-    const newContact: ContactCard = {
+    const newContact: Contact = {
       id: nanoid(),
       firstName,
       lastName,

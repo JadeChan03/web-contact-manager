@@ -1,14 +1,14 @@
 import { useAppSelector } from '../../redux/hooks';
-// import ContactCard from '../ContactCard/ContactCard';
+import { ContactCard } from '../ContactCard/ContactCard';
 
 export const ContactList = () => {
   // Select the `state.contactList` value from the store into the component
-  const contactList = useAppSelector((state) => state.contactList);
+  const contacts = useAppSelector((state) => state.contacts);
 
-  const renderedContactList = contactList.map((contactCard) => (
-    <div className="contact-card" key={contactCard.id}>
+  const renderedContactList = contacts.map((contact) => (
+    <div className="contact-card" key={contact.id}>
       <h3>
-        {contactCard.firstName} {contactCard.lastName}
+        <ContactCard contact={contact}/>
       </h3>
     </div>
   ));

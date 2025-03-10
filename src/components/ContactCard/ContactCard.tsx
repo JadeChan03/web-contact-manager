@@ -1,10 +1,9 @@
+import { type Contact } from '../../types/contactTypes';
 
-export default function ContactCard() {
-	return (
-		<div>
-			first name:
-			<br/>
-			last name:
-		</div>
-	)
-}
+export const ContactCard: React.FC<{ contact: Contact }> = ({contact}) => {
+  return <div>
+	{contact.firstName}
+	<br/>
+	{contact.lastName}
+  </div>;
+};

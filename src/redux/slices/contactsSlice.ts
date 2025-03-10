@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { type ContactCard } from '../../types/contactTypes';
+import { type Contact } from '../../types/contactTypes';
 
 // this file takes care of any actions related to contacts
 
 // initial state of ContactList
-const initialState: ContactCard[] = [
+const initialState: Contact[] = [
   {id:'testID', firstName: 'firstName', lastName: 'lastName'}
 ];
 
@@ -13,12 +13,12 @@ export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
-    /* 'contacts/contactAdded' */
-    contactAdded: (state, action: PayloadAction<ContactCard>) => {
+    /* type: 'contacts/contactAdded', payload: ContactCard */
+    contactAdded: (state, action: PayloadAction<Contact>) => {
       state.push(action.payload);
     },
-    /* 'contacts/contactDeleted' */
-    /* 'contacts/contactUpdated' */
+    /* type: 'contacts/contactDeleted', payload: ContactCard */
+    /* type: 'contacts/contactUpdated', payload: ContactCard */
   },
 });
 
