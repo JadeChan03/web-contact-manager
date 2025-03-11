@@ -8,7 +8,7 @@ export const ContactList = () => {
   const renderedContactList = contacts.map((contact) => (
     <div className="contact-card" key={contact.id}>
       <h3>
-        <ContactCard contact={contact}/>
+        <ContactCard contact={contact} />
       </h3>
     </div>
   ));

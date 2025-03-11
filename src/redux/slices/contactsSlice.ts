@@ -6,7 +6,7 @@ import { type Contact } from '../../types/contactTypes';
 
 // initial state of ContactList
 const initialState: Contact[] = [
-  {id:'testID', firstName: 'firstName', lastName: 'lastName'}
+  { id: 'testID', firstName: 'firstName', lastName: 'lastName', phones: ['00000000'] },
 ];
 
 export const contactsSlice = createSlice({
