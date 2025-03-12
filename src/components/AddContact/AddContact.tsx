@@ -3,63 +3,41 @@ import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
 import { type Contact } from '../../types/contactTypes';
+import { useDynamicForm } from '../../hooks/useDynamicForm';
+import { DynamicInput } from '../DynamicInput/DynamicInput';
 
 export const AddContact = () => {
   const initialValues = {
+    id: '',
     firstName: '',
     lastName: '',
-    phones: [''], // starts with one empty phone input
+    phones: [''],
+    emails: [''],
+    addresses: [''],
   };
-  // input value state
-  const [values, setValues] = useState(initialValues);
+  const {
+    values,
+    setValues,
+    handleChange,
+    handleDynamicChange,
+    addDynamicField,
+    deleteDynamicField,
+  } = useDynamicForm(initialValues);
+
   // visibility state (toggle form)
   const [visibility, setVisibility] = useState(false);
-  // get 'dispatch' method from the store
-  const dispatch = useAppDispatch();
-  // handles addContact button click
-
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setVisibility(true);
   };
-  // updates single input values ie. firstName, lastName
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.currentTarget;
-    setValues({ ...values, [name]: value });
-  };
+  // get 'dispatch' method from the store
+  const dispatch = useAppDispatch();
 
-  // updates input values w/ the option to add multiple inputs ie. phones
-  // update a specific phone number by index
-  const handlePhoneChange = (index: number, value: string) => {
-    const newPhones = [...values.phones];
-    newPhones[index] = value;
-    setValues({ ...values, phones: newPhones });
-  };
-
-  // add a new empty phone input
-  const handleAddPhone = () => {
-    setValues({ ...values, phones: [...values.phones, ''] });
-  };
-
-  const handleDeletePhone = (index: number) => {
-    console.log('delete clicked');
-    // remove current phone from new phone list
-    const filteredPhones = values.phones.filter((_, i) => i !== index);
-    console.log('filteredPhones ', filteredPhones);
-    console.log('index ', index);
-    setValues({ ...values, phones: filteredPhones });
-    console.log('values ', values);
-  };
-
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // prevent server submission
     e.preventDefault();
 
-    // string
-    const firstName = e.currentTarget.firstName.value;
-    const lastName = e.currentTarget.lastName.value;
-    // an array
-    const phones = e.currentTarget.phones.value;
+    const { firstName, lastName, phones, emails, addresses } = values;
 
     // create contact card object and dispatch 'contactAdded' action
     const newContact: Contact = {
@@ -67,14 +45,18 @@ export const AddContact = () => {
       firstName,
       lastName,
       phones,
+      emails,
+      addresses,
     };
+    console.log('object being dispatched ', newContact);
     dispatch(contactAdded(newContact));
 
     e.currentTarget.reset();
 
     // close form
     setVisibility(false);
-    // clear input fields
+
+    // // clear input fields
     setValues(initialValues);
   };
 
@@ -82,56 +64,64 @@ export const AddContact = () => {
     <>
       <button onClick={handleClick}>add contact</button>
 
-      {visibility ? (
-        <form onSubmit={submitHandler}>
-          <br/>
-          <label>first name:</label>
+      {visibility && (
+        <form onSubmit={handleSubmit}>
+          {/* simple inputs */}
+          <div>
+          <label>first name</label>
           <input
-            type="text"
             name="firstName"
+            placeholder="enter first name"
             value={values.firstName}
             onChange={handleChange}
-            required={true}
-          ></input>
-          <br/>
-          <label>last name:</label>
+          />
+          </div>
+          <div>
+          <label>last name</label>
           <input
-            type="text"
             name="lastName"
+            placeholder="enter last name"
             value={values.lastName}
             onChange={handleChange}
-            required={true}
-          ></input>
-          <br/>
-          <label>phone: </label>
-          {values.phones.map((phone, index) => (
-            <>
-              <br/>
-              <input
-                key={index}
-                type="tel"
-                name="phones"
-                value={values.phones[index]}
-                onChange={(e) => handlePhoneChange(index, e.target.value)}
-                placeholder="phone number"
-                required={true}
-              ></input>
+          />
+          </div>
+          {/* phone numbers */}
+          <DynamicInput
+          fieldName="phones"
+          values={values.phones}
+          label="phone"
+          onChange={handleDynamicChange}
+          onAdd={addDynamicField}
+          onDelete={deleteDynamicField}
+          inputType="tel"
+          placeholder="+852 1234-5678"
+          />
+          {/* emails */}
+          <DynamicInput
+          fieldName="emails"
+          values={values.emails}
+          label="email"
+          onChange={handleDynamicChange}
+          onAdd={addDynamicField}
+          onDelete={deleteDynamicField}
+          inputType="email"
+          placeholder="your@email.com"
+          />
+          {/* addresses */}
+          <DynamicInput
+            fieldName="addresses"
+            values={values.addresses}
+            label="address"
+            onChange={handleDynamicChange}
+            onAdd={addDynamicField}
+            onDelete={deleteDynamicField}
+            inputType="textarea"
+            placeholder="street, city"
+          />
 
-              {/* show delete button only when multiple phones exist */}
-              {values.phones.length > 1 && (
-                <button type="button" onClick={() => handleDeletePhone(index)}>
-                  Delete
-                </button>
-              )}
-            </>
-          ))}
-          <button onClick={handleAddPhone}> add phone </button>
-          <></>
-          <br/>
-          <button type="submit">submit</button>
+          {/* submit button */}
+          <button type="submit">Submit</button>
         </form>
-      ) : (
-        <></>
       )}
     </>
   );

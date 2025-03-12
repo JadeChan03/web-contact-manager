@@ -6,11 +6,7 @@ export const ContactList = () => {
   const contacts = useAppSelector((state) => state.contacts);
 
   const renderedContactList = contacts.map((contact) => (
-    <div className="contact-card" key={contact.id}>
-      <h3>
-        <ContactCard contact={contact} />
-      </h3>
-    </div>
+      <ContactCard contact={contact} key={contact.id}/>
   ));
 
   return (
