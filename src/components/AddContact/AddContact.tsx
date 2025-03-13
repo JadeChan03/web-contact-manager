@@ -14,6 +14,11 @@ export const AddContact = () => {
     phones: [''],
     emails: [''],
     addresses: [''],
+    categories: [''],
+    organisation: '',
+    webUrl: '',
+    notes: '',
+    tags: [''],
   };
   const {
     values,
@@ -26,9 +31,11 @@ export const AddContact = () => {
 
   // visibility state (toggle form)
   const [visibility, setVisibility] = useState(false);
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+  const toggleForm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setVisibility(true);
+    setVisibility(!visibility);
+    setValues(initialValues);
   };
   // get 'dispatch' method from the store
   const dispatch = useAppDispatch();
@@ -37,7 +44,18 @@ export const AddContact = () => {
     // prevent server submission
     e.preventDefault();
 
-    const { firstName, lastName, phones, emails, addresses } = values;
+    const {
+      firstName,
+      lastName,
+      phones,
+      emails,
+      addresses,
+      categories,
+      organisation,
+      webUrl,
+      notes,
+      tags,
+    } = values;
 
     // create contact card object and dispatch 'contactAdded' action
     const newContact: Contact = {
@@ -47,65 +65,70 @@ export const AddContact = () => {
       phones,
       emails,
       addresses,
+      categories,
+      organisation,
+      webUrl,
+      notes,
+      tags,
     };
     console.log('object being dispatched ', newContact);
+    // dispatch newContact to contacts state in redux
     dispatch(contactAdded(newContact));
-
-    e.currentTarget.reset();
-
     // close form
     setVisibility(false);
-
     // // clear input fields
     setValues(initialValues);
   };
 
   return (
     <>
-      <button onClick={handleClick}>add contact</button>
+      <button onClick={toggleForm}>
+        {visibility ? 'close form' : 'add new contact'}
+      </button>
 
       {visibility && (
         <form onSubmit={handleSubmit}>
-          {/* simple inputs */}
+          {/* first name */}
           <div>
-          <label>first name</label>
-          <input
-            name="firstName"
-            placeholder="enter first name"
-            value={values.firstName}
-            onChange={handleChange}
-          />
+            <label>first name</label>
+            <input
+              name="firstName"
+              placeholder="enter first name"
+              value={values.firstName}
+              onChange={handleChange}
+            />
           </div>
+          {/* last name */}
           <div>
-          <label>last name</label>
-          <input
-            name="lastName"
-            placeholder="enter last name"
-            value={values.lastName}
-            onChange={handleChange}
-          />
+            <label>last name</label>
+            <input
+              name="lastName"
+              placeholder="enter last name"
+              value={values.lastName}
+              onChange={handleChange}
+            />
           </div>
           {/* phone numbers */}
           <DynamicInput
-          fieldName="phones"
-          values={values.phones}
-          label="phone"
-          onChange={handleDynamicChange}
-          onAdd={addDynamicField}
-          onDelete={deleteDynamicField}
-          inputType="tel"
-          placeholder="+852 1234-5678"
+            fieldName="phones"
+            values={values.phones}
+            label="phone"
+            onChange={handleDynamicChange}
+            onAdd={addDynamicField}
+            onDelete={deleteDynamicField}
+            inputType="tel"
+            placeholder="+852 1234-5678"
           />
           {/* emails */}
           <DynamicInput
-          fieldName="emails"
-          values={values.emails}
-          label="email"
-          onChange={handleDynamicChange}
-          onAdd={addDynamicField}
-          onDelete={deleteDynamicField}
-          inputType="email"
-          placeholder="your@email.com"
+            fieldName="emails"
+            values={values.emails}
+            label="email"
+            onChange={handleDynamicChange}
+            onAdd={addDynamicField}
+            onDelete={deleteDynamicField}
+            inputType="email"
+            placeholder="your@email.com"
           />
           {/* addresses */}
           <DynamicInput
@@ -118,9 +141,61 @@ export const AddContact = () => {
             inputType="textarea"
             placeholder="street, city"
           />
-
+          {/* categories */}
+          <DynamicInput
+            fieldName="categories"
+            values={values.categories}
+            label="categories"
+            onChange={handleDynamicChange}
+            onAdd={addDynamicField}
+            onDelete={deleteDynamicField}
+            inputType="text"
+            placeholder="ie. family, work, school"
+          />
+          {/* organisation */}
+          <div>
+            <label>organisation</label>
+            <input
+              name="organisation"
+              placeholder="enter organisation name"
+              value={values.organisation}
+              onChange={handleChange}
+            />
+          </div>
+          {/* webUrl */}
+          <div>
+            <label>website url</label>
+            <input
+              name="webUrl"
+              placeholder="enter website url"
+              value={values.webUrl}
+              onChange={handleChange}
+            />
+          </div>
+          {/* notes */}
+          <div>
+            <label>notes</label>
+            <input
+              name="notes"
+              placeholder="enter notes"
+              value={values.notes}
+              onChange={handleChange}
+              type="textarea"
+            />
+          </div>
+          {/* tags */}
+          <DynamicInput
+            fieldName="tags"
+            values={values.tags}
+            label="tags"
+            onChange={handleDynamicChange}
+            onAdd={addDynamicField}
+            onDelete={deleteDynamicField}
+            inputType="text"
+            placeholder="ie. casper's friend, cat-sitter"
+          />
           {/* submit button */}
-          <button type="submit">Submit</button>
+          <button type="submit">add contact</button>
         </form>
       )}
     </>

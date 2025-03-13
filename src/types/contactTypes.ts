@@ -1,3 +1,4 @@
+
 export interface Contact {
 	id: string;
 	firstName: string;
@@ -5,5 +6,13 @@ export interface Contact {
 	phones: string[];
 	emails: string[];
     addresses: string[];
+	categories: string[];
+	organisation: string;
+	webUrl: string;
+	notes: string;
+	tags: string[];
   }
+
+
+
   
