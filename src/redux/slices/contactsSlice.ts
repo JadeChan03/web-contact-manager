@@ -1,12 +1,17 @@
 import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
 import type { RootState } from '../types';
-// import type { Contact } from '../../types/contactTypes';
+import type { Contact } from '../../types/contactTypes';
+// import { EntityId } from '@reduxjs/toolkit';
+
 
 // source: https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#converting-the-todos-reducer
 // creates an "adapter" object that contains premade reducer functions
 // functions can be used as case reducers inside of createSlice
-const contactsAdapter = createEntityAdapter();
-const initialState = contactsAdapter.getInitialState();
+const contactsAdapter = createEntityAdapter<Contact>();
+const initialState = contactsAdapter.getInitialState({
+	id: [] as string[],
+	entities: {} as {EntityId: Contact},
+});
 // getInitialState returns an object that looks like: {ids: [], entities: {}}
 
 const contactsSlice = createSlice({

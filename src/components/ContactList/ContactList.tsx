@@ -1,13 +1,14 @@
 import { useAppSelector } from '../../redux/hooks';
 import { ContactCard } from '../ContactCard/ContactCard';
 import { selectAllContacts } from '../../redux/slices/contactsSlice';
-// import { type Contact } from '../../types/contactTypes';
+import { type Contact } from '../../types/contactTypes';
 
 export const ContactList = () => {
-  // select ALL contacts
+  // select all contacts with memoized selectors, which returns an array of objects
   const contacts = useAppSelector(selectAllContacts);
+  console.log('contacts ', contacts);
 
-  const renderedContacts = contacts.map((contact) => (
+  const renderedContacts = contacts.map((contact: Contact) => (
     <ContactCard contact={contact} key={contact.id} />
   ));
 

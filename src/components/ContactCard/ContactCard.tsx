@@ -1,4 +1,5 @@
-// import { type Contact } from '../../types/contactTypes';
+import { type Contact } from '../../types/contactTypes';
+// import { EntityId, EntityState } from '@reduxjs/toolkit';
 // type ContactField = keyof Contact;
 import { useAppDispatch } from '../../redux/hooks';
 import {
@@ -7,7 +8,7 @@ import {
 } from '../../redux/slices/contactsSlice';
 // import { useParams } from 'react-router-dom';
 
-export const ContactCard: React.FC = ({ contact }) => {
+export const ContactCard: React.FunctionComponent<{contact: Contact}> = ( { contact } ) => {
   // get 'dispatch' method from the store
   const dispatch = useAppDispatch();
 
