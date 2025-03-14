@@ -1,3 +1,5 @@
+/* REDUX TYPES */
+
 import { EntityId } from '@reduxjs/toolkit';
 import { type Contact } from '../types/contactTypes';
 import { store } from './store';
@@ -9,7 +11,7 @@ export type AppDispatch = typeof store.dispatch;
 // infer the `RootState` type
 export type RootState = ReturnType<typeof store.getState>;
 
-export type contactsState = {
+export type ContactsState = {
   ids: EntityId[];
   entities: { EntityId: Contact };
 };

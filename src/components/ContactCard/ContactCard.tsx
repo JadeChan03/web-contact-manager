@@ -12,20 +12,6 @@ export const ContactCard: React.FunctionComponent<{contact: Contact}> = ( { cont
   // get 'dispatch' method from the store
   const dispatch = useAppDispatch()
 
-  // TODO -> implement react routers
-  // const {
-  //   id,
-  //   firstName,
-  //   lastName,
-  //   phones,
-  //   emails,
-  //   addresses,
-  //   organisation,
-  //   categories,
-  //   notes,
-  //   tags,
-  // } = useParams();
-
   const { id, firstName, lastName, phones } = contact;
 
   const handleDeleteCard = (e: React.MouseEvent<HTMLButtonElement>) => {

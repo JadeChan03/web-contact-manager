@@ -1,15 +1,29 @@
 import { type Contact } from '../types/contactTypes';
-type ContactField = keyof Contact;
+// type ContactField = keyof Contact;
+import { UseFieldArrayReturn, Control } from 'react-hook-form';
 
 export interface DynamicInputProps {
-	fieldName: ContactField;
-	values: string[];
+	fieldArray: UseFieldArrayReturn<Contact>;
+	control?: Control<Contact>;
 	label: string;
-	onAdd: (fieldName: ContactField) => void;
-	onDelete: (fieldName: ContactField, index: number) => void;
-	onChange: (fieldName: ContactField, index: number, value: string) => void;
-	inputType?: React.HTMLInputTypeAttribute; 
+	inputType?: string;
 	placeholder?: string;
-	addButtonText?: string;
-	showRemove?: boolean;
+	register: any; // idk
+	fieldName: string;
+	errors?: any; // idk
+	validation?: Record<string, RegExp>; // idk
   }
+
+
+// {
+// 	fieldName: ContactField;
+// 	values: string[];
+// 	label: string;
+// 	onAdd: (fieldName: ContactField) => void;
+// 	onDelete: (fieldName: ContactField, index: number) => void;
+// 	onChange: (fieldName: ContactField, index: number, value: string) => void;
+// 	inputType?: React.HTMLInputTypeAttribute; 
+// 	placeholder?: string;
+// 	addButtonText?: string;
+// 	showRemove?: boolean;
+//   }

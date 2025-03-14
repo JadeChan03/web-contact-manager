@@ -1,16 +1,20 @@
-import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
-import type { RootState } from '../types';
-import type { Contact } from '../../types/contactTypes';
-// import { EntityId } from '@reduxjs/toolkit';
-
+import {
+  createSlice,
+  createEntityAdapter,
+  createSelector,
+  // EntityAdapter,
+  // EntityId,
+} from '@reduxjs/toolkit';
+import { type RootState } from '../types';
+import { type Contact } from '../../types/contactTypes';
 
 // source: https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#converting-the-todos-reducer
 // creates an "adapter" object that contains premade reducer functions
 // functions can be used as case reducers inside of createSlice
 const contactsAdapter = createEntityAdapter<Contact>();
 const initialState = contactsAdapter.getInitialState({
-	id: [] as string[],
-	entities: {} as {EntityId: Contact},
+  id: [] as string[],
+  entities: {} as { EntityId: Contact },
 });
 // getInitialState returns an object that looks like: {ids: [], entities: {}}
 
@@ -29,15 +33,17 @@ export const { contactAdded, contactDeleted } = contactsSlice.actions;
 // export the slice reducer for use in the store configuration
 export default contactsSlice.reducer;
 
-// selectors
-// getSelectors generates a standard set of selector functions
-const { selectAll, selectById } = contactsAdapter.getSelectors<RootState>(
-  (state) => state.contacts
+/* SELECTORS */
+
+const contactsSelectors = contactsAdapter.getSelectors<RootState>(
+  state => state.contacts
 );
+export const { selectAll: selectContacts, selectById: selectContactById } = contactsSelectors
 
-export const selectAllContacts = selectAll;
-export const selectContactById = selectById;
 
-// source: https://redux-toolkit.js.org/api/createEntityAdapter
-// source: https://medium.com/@RobertoSilvaZ/what-is-createentityadapter-in-react-toolkit-ec4b99fa74b7
-// createEntityAdapter accepts a single options object parameter, with two optional fields inside.
+export const selectTodoIds = createSelector(
+  selectContacts,
+  // "output selector" that receives all the input results as arguments
+  // and returns a final result value
+  (contacts) => contacts.map((contact) => contact.id)
+);

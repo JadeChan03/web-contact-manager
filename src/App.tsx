@@ -1,5 +1,6 @@
 import './App.css';
 import { Home } from './pages/Home/Home';
+import { EditContact } from './components/EditContact/EditContact';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 /* 
@@ -15,6 +16,7 @@ export const App = () => (
     <div className="App">
       <Routes>
         <Route path="/" element={<Home />} />
+        {/* <Route path="/contact/:id" element={<EditContact/>} /> */}
       </Routes>
     </div>
   </Router>

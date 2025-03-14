@@ -1,5 +1,5 @@
 import { ContactList } from '../../components/ContactList/ContactList'
-import { AddContact } from '../../components/AddContact/AddContact'
+import { AddContact } from '../../components/AddContact/AddContact.tsx'
 
 export const Home = () => {
 	return (
