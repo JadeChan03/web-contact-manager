@@ -1,24 +1,21 @@
 import './App.css';
-import Home from './pages/Home/Home';
+import { Home } from './pages/Home/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-export default function App() {
+/* 
+PATHS:
+"/" -> Home -> AddContact, ContactList
+"/contact/:id" ->  EditContact :id
+"/search/:field" -> ContactList filtered 
+*/
 
-  return (
-    <Router>
+export const App = () => (
+  <Router>
+    {/* <Navbar /> */} 
     <div className="App">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Home/>
-            </>
-          }
-        ></Route>
+        <Route path="/" element={<Home />} />
       </Routes>
     </div>
   </Router>
-  )
-}
-;
+);

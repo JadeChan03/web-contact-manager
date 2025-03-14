@@ -10,7 +10,7 @@ import {
 
 export const ContactCard: React.FunctionComponent<{contact: Contact}> = ( { contact } ) => {
   // get 'dispatch' method from the store
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   // TODO -> implement react routers
   // const {
