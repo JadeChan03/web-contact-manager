@@ -2,15 +2,21 @@ import { type Contact } from '../../types/contactTypes';
 // import { EntityId, EntityState } from '@reduxjs/toolkit';
 // type ContactField = keyof Contact;
 import { useAppDispatch } from '../../redux/hooks';
+// import { useNavigate } from 'react-router-dom';
 import {
   contactDeleted,
   // selectContactById,
 } from '../../redux/slices/contactsSlice';
 // import { useParams } from 'react-router-dom';
+import { Card, CardActions, CardContent, Typography, Button } from '@mui/joy';
+import { Link as RouterLink } from "react-router";
 
-export const ContactCard: React.FunctionComponent<{contact: Contact}> = ( { contact } ) => {
+export const ContactCard: React.FunctionComponent<{ contact: Contact }> = ({
+  contact,
+}) => {
   // get 'dispatch' method from the store
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
+  // const navigate = useNavigate();
 
   const { id, firstName, lastName, phones } = contact;
 
@@ -21,16 +27,20 @@ export const ContactCard: React.FunctionComponent<{contact: Contact}> = ( { cont
   };
 
   return (
-    <div className="contact-card">
-      <button onClick={handleDeleteCard}>delete card</button>
-      <div>
-        <h1>{`${firstName} ${lastName}`}</h1>
-      </div>
-      <ul>
-        {phones.map((phone, index) => (
-          <li key={index}>{phone}</li>
-        ))}
-      </ul>
-    </div>
+    <Card className="contact-card">
+      <CardActions component={RouterLink} to={`/contact/${id}`}>
+      <CardContent>
+        <Button onClick={handleDeleteCard}>delete card</Button>
+        <Typography>
+        {`${firstName} ${lastName}`}
+        </Typography>
+        <ul>
+          {phones.map((phone, index) => (
+            <li key={index}>{phone}</li>
+          ))}
+        </ul>
+      </CardContent>
+      </CardActions>
+    </Card>
   );
 };

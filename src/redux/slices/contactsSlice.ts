@@ -25,21 +25,27 @@ const contactsSlice = createSlice({
     contactAdded: contactsAdapter.addOne,
     // use an adapter reducer function to remove a contact by ID
     contactDeleted: contactsAdapter.removeOne,
+    contactUpdated: (contactsState, action) => {
+      console.log('updating contact:', action.payload); // debug log
+      const { id, changes } = action.payload;
+      contactsAdapter.updateOne(contactsState, { id, changes });
+    },
   },
 });
 
 // export the generated action creators for use in components
-export const { contactAdded, contactDeleted } = contactsSlice.actions;
+export const { contactAdded, contactDeleted, contactUpdated } =
+  contactsSlice.actions;
 // export the slice reducer for use in the store configuration
 export default contactsSlice.reducer;
 
 /* SELECTORS */
 
 const contactsSelectors = contactsAdapter.getSelectors<RootState>(
-  state => state.contacts
+  (state) => state.contacts
 );
-export const { selectAll: selectContacts, selectById: selectContactById } = contactsSelectors
-
+export const { selectAll: selectContacts, selectById: selectContactById } =
+  contactsSelectors;
 
 export const selectTodoIds = createSelector(
   selectContacts,

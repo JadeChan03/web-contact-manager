@@ -1,17 +1,17 @@
 import { type Contact } from '../types/contactTypes';
 // type ContactField = keyof Contact;
-import { UseFieldArrayReturn, Control } from 'react-hook-form';
+import { UseFieldArrayReturn, Control, UseFormRegister, FieldErrors, FieldArray, FieldValue } from 'react-hook-form';
 
 export interface DynamicInputProps {
-	fieldArray: UseFieldArrayReturn<Contact>;
+	fieldArray?: UseFieldArrayReturn<Contact>;
 	control?: Control<Contact>;
 	label: string;
 	inputType?: string;
 	placeholder?: string;
-	register: any; // idk
-	fieldName: string;
-	errors?: any; // idk
-	validation?: Record<string, RegExp>; // idk
+	register: UseFormRegister<Contact> // ? * not sure
+	fieldName: string
+	errors?: FieldErrors<Contact>; // ? * not sure
+	validation?: {pattern?: {value: RegExp, message?: string}}; // ? * not sure
   }
 
 
