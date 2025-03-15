@@ -1,46 +1,47 @@
-import { type Contact } from '../../types/contactTypes';
-// import { EntityId, EntityState } from '@reduxjs/toolkit';
-// type ContactField = keyof Contact;
-import { useAppDispatch } from '../../redux/hooks';
-// import { useNavigate } from 'react-router-dom';
-import {
-  contactDeleted,
-  // selectContactById,
-} from '../../redux/slices/contactsSlice';
-// import { useParams } from 'react-router-dom';
-import { Card, CardActions, CardContent, Typography, Button } from '@mui/joy';
-import { Link as RouterLink } from "react-router";
+import { Contact } from '../../types/contactTypes';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { contactDeleted, selectContactById } from '../../redux/slices/contactsSlice';
+import { Card, CardContent, Typography, Button } from '@mui/joy';
+import { Link as RouterLink } from 'react-router';
+import { EntityId } from '@reduxjs/toolkit';
 
-export const ContactCard: React.FunctionComponent<{ contact: Contact }> = ({
-  contact,
+
+export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
+ id
 }) => {
   // get 'dispatch' method from the store
   const dispatch = useAppDispatch();
   // const navigate = useNavigate();
 
-  const { id, firstName, lastName, phones } = contact;
+  console.log('id ', id);
+
+  const selectedContact = useAppSelector((contactsState) => selectContactById(contactsState, id));
+  const { firstName = 'N/A', lastName = 'N/A', phones = [] } = selectedContact || {};
+
+  console.log('CONTACT CARD ', selectedContact)
 
   const handleDeleteCard = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // prevent link navigation
     e.preventDefault();
-    // dispatch delete contact action -> updates redux state
-    dispatch(contactDeleted(id));
+    if (window.confirm(`Are you sure you want to delete ${firstName} ${lastName}?`)) {
+      dispatch(contactDeleted(id)); 
+    }
   };
 
   return (
+
     <Card className="contact-card">
-      <CardActions component={RouterLink} to={`/contact/${id}`}>
-      <CardContent>
-        <Button onClick={handleDeleteCard}>delete card</Button>
-        <Typography>
-        {`${firstName} ${lastName}`}
-        </Typography>
-        <ul>
-          {phones.map((phone, index) => (
-            <li key={index}>{phone}</li>
-          ))}
-        </ul>
-      </CardContent>
-      </CardActions>
+        <CardContent component={RouterLink} to={`/contact/${id}`}>
+          <Button onClick={handleDeleteCard}>delete card</Button>
+          edit here
+          <Typography>{`${firstName} ${lastName}`}</Typography>
+          <ul>
+            {phones.map((phone, index) => (
+              <li key={index}>{phone.value}</li>
+            ))}
+          </ul>
+        </CardContent>
     </Card>
+
   );
 };

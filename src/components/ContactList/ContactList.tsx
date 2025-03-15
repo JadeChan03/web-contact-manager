@@ -1,21 +1,32 @@
 import { useAppSelector } from '../../redux/hooks';
 import { ContactCard } from '../ContactCard/ContactCard';
 import { selectContacts } from '../../redux/slices/contactsSlice';
-import { type Contact } from '../../types/contactTypes';
+// import { Contact } from '../../types/contactTypes';
+import { Stack } from '@mui/joy';
 
 export const ContactList = () => {
   // select all contacts with memoized selectors, which returns an array of objects
   const contacts = useAppSelector(selectContacts);
-  console.log('contacts ', contacts);
+  console.log('RENDERING CONTACT LIST HERE ', contacts);
 
-  const renderedContacts = contacts.map((contact: Contact) => (
-    <ContactCard contact={contact} key={contact.id} />
+  const renderedContacts = contacts.map(({id}) => (
+    <ContactCard id={id} key={id} />
   ));
 
+
   return (
-    <section className="contact-list">
-      <h2>contact list:</h2>
+    <div className="contactList-container">
+    <h2>contact list:</h2>
+    <Stack
+      direction="row"
+      spacing={2}
+      sx={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       {renderedContacts.length < 1 ? `u have no contacts...` : renderedContacts}
-    </section>
+    </Stack>
+    </div>
   );
 };

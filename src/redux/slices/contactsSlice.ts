@@ -3,18 +3,18 @@ import {
   createEntityAdapter,
   createSelector,
   // EntityAdapter,
-  // EntityId,
+  EntityId,
 } from '@reduxjs/toolkit';
 import { type RootState } from '../types';
-import { type Contact } from '../../types/contactTypes';
+// import { type Contact } from '../../types/contactTypes';
 
 // source: https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#converting-the-todos-reducer
 // creates an "adapter" object that contains premade reducer functions
 // functions can be used as case reducers inside of createSlice
-const contactsAdapter = createEntityAdapter<Contact>();
+const contactsAdapter = createEntityAdapter();
 const initialState = contactsAdapter.getInitialState({
-  id: [] as string[],
-  entities: {} as { EntityId: Contact },
+  ids: [] as EntityId[],
+  entities: {},
 });
 // getInitialState returns an object that looks like: {ids: [], entities: {}}
 
@@ -25,10 +25,11 @@ const contactsSlice = createSlice({
     contactAdded: contactsAdapter.addOne,
     // use an adapter reducer function to remove a contact by ID
     contactDeleted: contactsAdapter.removeOne,
-    contactUpdated: (contactsState, action) => {
-      console.log('updating contact:', action.payload); // debug log
+    contactUpdated: (state, action) => {
+      console.log('INCOMING CONTACT', action.payload); // debug log
       const { id, changes } = action.payload;
-      contactsAdapter.updateOne(contactsState, { id, changes });
+      contactsAdapter.updateOne(state, { id, changes }); // taking in params, not destructuring
+      console.log(' UPDATED STATE.entities HERE ', state.entities);
     },
   },
 });

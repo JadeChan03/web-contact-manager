@@ -4,14 +4,14 @@ export interface Contact {
 	id: EntityId;
 	firstName: string;
 	lastName: string;
-	phones: string[];
-	emails: string[];
-	addresses: string[];
-	categories: string[];
+	phones: {id: string, value: string}[];
+	emails: {id: string, value: string}[];
+	addresses: {id: string, value: string}[];
+	categories: {id: string, value: string}[];
 	organisation: string;
 	webUrl: string;
 	notes: string;
-	tags: string[];
+	tags: {id: string, value: string}[];
 }
 
 // note:
