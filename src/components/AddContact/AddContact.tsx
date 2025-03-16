@@ -6,21 +6,34 @@ import { contactAdded } from '../../redux/slices/contactsSlice';
 import { type Contact } from '../../types/contactTypes';
 type ContactField = keyof Contact;
 
-import { Card, CardContent, Typography, Button, Input, Stack, Sheet, Box } from '@mui/joy';
+import {
+  Card,
+  Textarea,
+  Typography,
+  Button,
+  Input,
+  FormControl,
+  FormHelperText,
+  Box,
+} from '@mui/joy';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/joy/IconButton';
-import Textarea from '@mui/joy/Textarea';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
   const [visibility, setVisibility] = useState(false);
+
   const {
     control,
     handleSubmit,
     register,
     reset,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm({
     defaultValues: {
       id: nanoid(),
@@ -36,6 +49,9 @@ export const AddContact = () => {
       tags: [{ id: nanoid(), value: '' }],
     },
   });
+
+  // watch notes inputs for change
+  const notesValue = watch('notes', '');
 
   // field arrays for dynamic inputs
   const {
@@ -56,15 +72,16 @@ export const AddContact = () => {
     control: Control<Contact>
   ) => {
     return (
-      <div>
+      <>
         {fields.map((field, index) => (
-          <div key={field.id}>
+          <Box key={field.id} sx={{ display: 'flex' }}>
             <Input
               {...control.register(`${fieldName}.${index}.value`)}
               placeholder={`add ${label}`}
               defaultValue={field.value}
             />
-            {fields.length > 1 && (
+            {/* display ADD button instead of REMOVE on input element */}
+            {index === fields.length - 1 && fields.length > 1 ? (
               <IconButton
                 aria-label="Remove Input"
                 onClick={() => remove(index)}
@@ -72,13 +89,18 @@ export const AddContact = () => {
               >
                 <RemoveIcon />
               </IconButton>
+            ) : (
+              <IconButton
+                aria-label="Add Input"
+                onClick={append}
+                variant="outlined"
+              >
+                <AddIcon />
+              </IconButton>
             )}
-          </div>
+          </Box>
         ))}
-        <Button type="button" onClick={append} variant="outlined">
-          add {label}
-        </Button>
-      </div>
+      </>
     );
   };
 
@@ -96,51 +118,61 @@ export const AddContact = () => {
     reset();
   };
 
+  const handleCharLimit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    /* CHARACTER LIMIT*/
+    if (value.length <= 200) {
+      setValue('notes', value);
+    }
+  };
   return (
-    <Box sx={{display:'flex', justifyContent:'center'}}>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       {visibility ? (
-       <Box
-       sx={{
-         p: 2,
-         display: 'flex',
-         flexDirection: 'column',
-         alignItems: 'end',
-         justifyContent: 'center',
-       }}
-     >
+        <Card
+          sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'end',
+            justifyContent: 'start',
+            border: '1px solid grey',
+          }}
+        >
           <IconButton onClick={toggleForm}>
             <CloseIcon />
           </IconButton>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* first name */}
-            <div>
-              <Input
-                {...register('firstName', {
-                  required: 'First name is required',
-                })}
-                className={errors.firstName ? 'error' : ''}
-                placeholder="First name"
-                variant="outlined"
-              />
-              {errors?.firstName && <span>{errors.firstName.message}</span>}
-            </div>
+            <Box>
+              {/* first name */}
+              <>
+                <Input
+                  {...register('firstName', {
+                    required: 'First name is required',
+                  })}
+                  className={errors.firstName ? 'error' : ''}
+                  placeholder="First name"
+                  variant="outlined"
+                />
+                {errors?.firstName && <span>{errors.firstName.message}</span>}
+              </>
 
-            {/* last name */}
-            <div>
-           
-              <Input
-                {...register('lastName', { required: 'last name is required' })}
-                className={errors.lastName ? 'error' : ''}
-                placeholder="Last name"
-                variant="outlined"
-              />
-              {errors?.lastName && <span>{errors.lastName.message}</span>}
-            </div>
+              {/* last name */}
+              <>
+                <Input
+                  {...register('lastName', {
+                    required: 'last name is required',
+                  })}
+                  className={errors.lastName ? 'error' : ''}
+                  placeholder="Last name"
+                  variant="outlined"
+                />
+                {errors?.lastName && <span>{errors.lastName.message}</span>}
+              </>
+            </Box>
 
             {/* phone numbers */}
             <div>
-              <label>Phone numbers</label>
               {renderDynamicInputs(
                 phoneFields,
                 'phones',
@@ -152,21 +184,30 @@ export const AddContact = () => {
             </div>
 
             {/* notes */}
-            <div>
+            <FormControl error={notesValue.length >= 200 ? true : false}>
               <Textarea
                 {...register('notes')}
                 className={errors.notes ? 'error' : ''}
-                placeholder="Add notes"
+                placeholder="add notes"
+                endDecorator={
+                  <Typography level="body-xs" sx={{ ml: 'auto' }}>
+                    {notesValue.length} character(s)
+                  </Typography>
+                }
+                value={notesValue}
+                onChange={handleCharLimit}
               />
-              {errors?.firstName && <span>{errors.firstName.message}</span>}
-            </div>
+             { notesValue.length >= 200 && <FormHelperText>
+                <InfoOutlined />
+                Character limit reached
+              </FormHelperText>}
+            </FormControl>
 
             <Button type="submit" variant="outlined">
               Submit form
             </Button>
           </form>
-  
-        </Box>
+        </Card>
       ) : (
         <Button onClick={toggleForm} variant="outlined">
           Add new contact
