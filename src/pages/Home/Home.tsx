@@ -1,11 +1,12 @@
 import { ContactList } from '../../components/ContactList/ContactList';
 import { AddContact } from '../../components/AddContact/AddContact.tsx';
-// import { Grid } from '@mui/joy';
+import { Grid } from '@mui/joy';
+// import { PageContainer } from '@toolpad/core/PageContainer';
 
 export const Home = () => {
   return (
     <>
-      <h1>people</h1>
+    <h1>Home</h1>
       <AddContact />
       <ContactList />
     </>

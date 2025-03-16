@@ -3,5 +3,26 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "lib": ["es6", "dom"],
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./src", 
+    "paths": {
+      "@/*": ["*"] // optional: maps '@' to the 'src' directory
+    }
+  },
 }
+
+// source: https://mui.com/material-ui/guides/typescript/?srsltid=AfmBOooOia_swR4BTh51kZpCkVPfYRJW_aO8GXIRsDpM6QOZbI9Vus5J

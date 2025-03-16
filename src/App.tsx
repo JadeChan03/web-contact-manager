@@ -16,16 +16,23 @@ PATHS:
 export const App = () => (
   <CssVarsProvider disableTransitionOnChange>
     <CssBaseline />
-<Grid>
-    <Router>
-      {/* <Navbar /> */}
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/contact/:id" element={<EditContact />} />
-        </Routes>
-      </div>
-    </Router>
+    <Grid
+      container
+      direction="column"
+      sx={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Router>
+        {/* <Navbar /> */}
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/contact/:id" element={<EditContact />} />
+          </Routes>
+        </div>
+      </Router>
     </Grid>
   </CssVarsProvider>
 );

@@ -9,24 +9,25 @@ export const ContactList = () => {
   const contacts = useAppSelector(selectContacts);
   console.log('RENDERING CONTACT LIST HERE ', contacts);
 
-  const renderedContacts = contacts.map(({id}) => (
+  const renderedContacts = contacts.map(({ id }) => (
     <ContactCard id={id} key={id} />
   ));
 
-
   return (
     <div className="contactList-container">
-    <h2>contact list:</h2>
-    <Stack
-      direction="row"
-      spacing={2}
-      sx={{
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      {renderedContacts.length < 1 ? `u have no contacts...` : renderedContacts}
-    </Stack>
+      <h2>Contact List:</h2>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {renderedContacts.length < 1
+          ? `u have no contacts...`
+          : renderedContacts}
+      </Stack>
     </div>
   );
 };

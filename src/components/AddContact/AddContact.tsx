@@ -5,7 +5,12 @@ import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
 import { type Contact } from '../../types/contactTypes';
 type ContactField = keyof Contact;
-// import { useOnSubmit } from '../../hooks/hooks';
+
+import { Card, CardContent, Typography, Button, Input, Stack, Sheet, Box } from '@mui/joy';
+import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/joy/IconButton';
+import Textarea from '@mui/joy/Textarea';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
@@ -48,25 +53,31 @@ export const AddContact = () => {
     label: string,
     append: () => void,
     remove: (index: number) => void,
-	control: Control<Contact>
+    control: Control<Contact>
   ) => {
     return (
       <div>
         {fields.map((field, index) => (
           <div key={field.id}>
-            <input
+            <Input
               {...control.register(`${fieldName}.${index}.value`)}
               placeholder={`add ${label}`}
               defaultValue={field.value}
             />
-            <button type="button" onClick={() => remove(index)}>
-              x
-            </button>
+            {fields.length > 1 && (
+              <IconButton
+                aria-label="Remove Input"
+                onClick={() => remove(index)}
+                variant="outlined"
+              >
+                <RemoveIcon />
+              </IconButton>
+            )}
           </div>
         ))}
-        <button type="button" onClick={append}>
+        <Button type="button" onClick={append} variant="outlined">
           add {label}
-        </button>
+        </Button>
       </div>
     );
   };
@@ -85,52 +96,82 @@ export const AddContact = () => {
     reset();
   };
 
-  
-
   return (
-    <>
-      <button onClick={toggleForm}>
-        {visibility ? 'close form' : 'add new contact'}
-      </button>
+    <Box sx={{display:'flex', justifyContent:'center'}}>
+      {visibility ? (
+       <Box
+       sx={{
+         p: 2,
+         display: 'flex',
+         flexDirection: 'column',
+         alignItems: 'end',
+         justifyContent: 'center',
+       }}
+     >
+          <IconButton onClick={toggleForm}>
+            <CloseIcon />
+          </IconButton>
 
-      {visibility && (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* first name */}
-          <div>
-            <label>first name</label>
-            <input
-              {...register('firstName', { required: 'First name is required' })}
-              className={errors.firstName ? 'error' : ''}
-            />
-            {errors?.firstName && <span>{errors.firstName.message}</span>}
-          </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {/* first name */}
+            <div>
+              <Input
+                {...register('firstName', {
+                  required: 'First name is required',
+                })}
+                className={errors.firstName ? 'error' : ''}
+                placeholder="First name"
+                variant="outlined"
+              />
+              {errors?.firstName && <span>{errors.firstName.message}</span>}
+            </div>
 
-          {/* last name */}
-          <div>
-            <label>last name</label>
-            <input
-              {...register('lastName', { required: 'last name is required' })}
-              className={errors.lastName ? 'error' : ''}
-            />
-            {errors?.lastName && <span>{errors.lastName.message}</span>}
-          </div>
+            {/* last name */}
+            <div>
+           
+              <Input
+                {...register('lastName', { required: 'last name is required' })}
+                className={errors.lastName ? 'error' : ''}
+                placeholder="Last name"
+                variant="outlined"
+              />
+              {errors?.lastName && <span>{errors.lastName.message}</span>}
+            </div>
 
-          {/* phone numbers */}
-          <div>
-            <label>Phone Numbers</label>
-            {renderDynamicInputs(
-              phoneFields,
-              'phones',
-              'phone',
-              () => appendPhone({ id: nanoid(), value: '' }),
-              removePhone,
-			  control as Control<Contact>
-            )}
-          </div>
+            {/* phone numbers */}
+            <div>
+              <label>Phone numbers</label>
+              {renderDynamicInputs(
+                phoneFields,
+                'phones',
+                'phone',
+                () => appendPhone({ id: nanoid(), value: '' }),
+                removePhone,
+                control as Control<Contact>
+              )}
+            </div>
 
-          <button type="submit">submit form</button>
-        </form>
+            {/* notes */}
+            <div>
+              <Textarea
+                {...register('notes')}
+                className={errors.notes ? 'error' : ''}
+                placeholder="Add notes"
+              />
+              {errors?.firstName && <span>{errors.firstName.message}</span>}
+            </div>
+
+            <Button type="submit" variant="outlined">
+              Submit form
+            </Button>
+          </form>
+  
+        </Box>
+      ) : (
+        <Button onClick={toggleForm} variant="outlined">
+          Add new contact
+        </Button>
       )}
-    </>
+    </Box>
   );
 };

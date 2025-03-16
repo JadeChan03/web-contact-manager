@@ -1,4 +1,7 @@
-import { selectContactById, selectContacts } from '../../redux/slices/contactsSlice';
+import {
+  selectContactById,
+  selectContacts,
+} from '../../redux/slices/contactsSlice';
 import { useEffect } from 'react';
 import { useForm, useFieldArray, Control } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -6,16 +9,23 @@ import { contactUpdated } from '../../redux/slices/contactsSlice';
 import { useParams, useNavigate } from 'react-router-dom';
 import { type Contact } from '../../types/contactTypes';
 import { nanoid, EntityId } from '@reduxjs/toolkit';
-
 type ContactField = keyof Contact;
+
+import IconButton from '@mui/joy/IconButton';
+import { Card, CardContent, Typography, Button } from '@mui/joy';
+import RemoveIcon from '@mui/icons-material/Remove';
+import EditIcon from '@mui/icons-material/Edit';
+import Textarea from '@mui/joy/Textarea';
 
 export const EditContact: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   // select the contact from the Redux store based on the id
-  const contact = useAppSelector((contactsState) => selectContactById(contactsState, id as EntityId));
+  const contact = useAppSelector((contactsState) =>
+    selectContactById(contactsState, id as EntityId)
+  );
 
   const {
     control,
@@ -24,12 +34,12 @@ export const EditContact: React.FC = () => {
     reset,
     formState: { errors },
   } = useForm<Contact>({
-    defaultValues: contact, 
+    defaultValues: contact,
   });
 
   useEffect(() => {
     if (contact) {
-      reset(contact); 
+      reset(contact);
     }
   }, [contact, reset]);
 
@@ -57,28 +67,34 @@ export const EditContact: React.FC = () => {
           <div key={field.id}>
             <input
               {...control.register(`${fieldName}.${index}.value`)}
-              placeholder={`add ${label}`}
+              placeholder={`Add ${label}`}
               // value={field.value}
             />
-            <button type="button" onClick={() => remove(index)}>
-              x
-            </button>
+
+            {fields.length > 1 && (
+              <IconButton
+                aria-label="Remove Input"
+                onClick={() => remove(index)}
+                variant="outlined"
+              >
+                <RemoveIcon />
+              </IconButton>
+            )}
           </div>
         ))}
-        <button type="button" onClick={append}>
-          add {label}
-        </button>
+        <Button onClick={append}>Add {label}</Button>
       </div>
     );
   };
 
- 
   const onSubmit = (data: Contact) => {
     if (!id) return;
-    dispatch(contactUpdated({
-      id,
-      changes: data // ID and changes must be passed separately
-    }));
+    dispatch(
+      contactUpdated({
+        id,
+        changes: data, // ID and changes must be passed separately
+      })
+    );
     navigate(`/`);
   };
 
@@ -115,6 +131,17 @@ export const EditContact: React.FC = () => {
           removePhone,
           control
         )}
+      </div>
+
+      {/* notes */}
+      <div>
+        <label>Notes</label>
+        <Textarea
+          {...register('notes')}
+          className={errors.notes ? 'error' : ''}
+          placeholder="Add notes"
+        />
+        {errors?.firstName && <span>{errors.firstName.message}</span>}
       </div>
 
       <button type="submit">Update Contact</button>
