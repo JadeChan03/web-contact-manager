@@ -8,7 +8,7 @@ import { Link as RouterLink } from 'react-router';
 import { EntityId } from '@reduxjs/toolkit';
 
 import IconButton from '@mui/joy/IconButton';
-import { Card, CardContent, Typography, Button } from '@mui/joy';
+import { Card, CardContent, Typography } from '@mui/joy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 

@@ -5,12 +5,12 @@ import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
 import { type Contact } from '../../types/contactTypes';
 type ContactField = keyof Contact;
-
+import { PhoneInput } from '../PhoneInput/PhoneInput';
 import {
-  Card,
   Textarea,
-  Typography,
+  Card,
   Button,
+  Typography,
   Input,
   FormControl,
   FormHelperText,
@@ -34,7 +34,7 @@ export const AddContact = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm({
+  } = useForm<Contact>({
     defaultValues: {
       id: nanoid(),
       firstName: '',
@@ -63,9 +63,63 @@ export const AddContact = () => {
     name: 'phones',
   });
 
+  // phones -------------------
+
+  const createInput = (
+    fieldName: ContactField,
+    label: string,
+    control: Control<Contact>,
+    field: { id: string; value: string; countryCode?: string },
+    index: number
+  ) => {
+    switch (fieldName) {
+      case 'phones':
+        return (
+          <PhoneInput
+            fieldName={fieldName}
+            index={index}
+            control={control}
+            defaultValue={field.value}
+          />
+        );
+      case 'addresses':
+        return (
+          <Input
+            {...control.register(`${fieldName}.${index}.value`)}
+            placeholder={`add ${label}`}
+            defaultValue={field.value}
+          />
+        );
+      case 'emails':
+        return (
+          <Input
+            {...control.register(`${fieldName}.${index}.value`)}
+            placeholder={`add ${label}`}
+            defaultValue={field.value}
+          />
+        );
+      case 'categories':
+        return (
+          <Input
+            {...control.register(`${fieldName}.${index}.value`)}
+            placeholder={`add ${label}`}
+            defaultValue={field.value}
+          />
+        );
+      case 'tags':
+        return (
+          <Input
+            {...control.register(`${fieldName}.${index}.value`)}
+            placeholder={`add ${label}`}
+            defaultValue={field.value}
+          />
+        );
+    }
+  };
+
   const renderDynamicInputs = (
     fields: { id: string; value: string }[],
-    fieldName: ContactField,
+    fieldName: keyof Contact,
     label: string,
     append: () => void,
     remove: (index: number) => void,
@@ -75,11 +129,8 @@ export const AddContact = () => {
       <>
         {fields.map((field, index) => (
           <Box key={field.id} sx={{ display: 'flex' }}>
-            <Input
-              {...control.register(`${fieldName}.${index}.value`)}
-              placeholder={`add ${label}`}
-              defaultValue={field.value}
-            />
+            {createInput(fieldName, label, control, field, index)}
+
             {/* display ADD button instead of REMOVE on input element */}
             {index === fields.length - 1 && fields.length > 1 ? (
               <IconButton
@@ -125,9 +176,11 @@ export const AddContact = () => {
       setValue('notes', value);
     }
   };
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       {visibility ? (
+        /* ---- form component ---- */
         <Card
           sx={{
             p: 2,
@@ -161,7 +214,7 @@ export const AddContact = () => {
               <>
                 <Input
                   {...register('lastName', {
-                    required: 'last name is required',
+                    required: 'Last name is required',
                   })}
                   className={errors.lastName ? 'error' : ''}
                   placeholder="Last name"
@@ -179,7 +232,7 @@ export const AddContact = () => {
                 'phone',
                 () => appendPhone({ id: nanoid(), value: '' }),
                 removePhone,
-                control as Control<Contact>
+                control
               )}
             </div>
 
@@ -197,10 +250,12 @@ export const AddContact = () => {
                 value={notesValue}
                 onChange={handleCharLimit}
               />
-             { notesValue.length >= 200 && <FormHelperText>
-                <InfoOutlined />
-                Character limit reached
-              </FormHelperText>}
+              {notesValue.length >= 200 && (
+                <FormHelperText>
+                  <InfoOutlined />
+                  Character limit reached
+                </FormHelperText>
+              )}
             </FormControl>
 
             <Button type="submit" variant="outlined">

@@ -25,12 +25,13 @@ const contactsSlice = createSlice({
     contactAdded: contactsAdapter.addOne,
     // use an adapter reducer function to remove a contact by ID
     contactDeleted: contactsAdapter.removeOne,
-    contactUpdated: (state, action) => {
-      console.log('INCOMING CONTACT', action.payload); // debug log
-      const { id, changes } = action.payload;
-      contactsAdapter.updateOne(state, { id, changes }); // taking in params, not destructuring
-      console.log(' UPDATED STATE.entities HERE ', state.entities);
-    },
+    contactUpdated: contactsAdapter.updateOne
+    // contactUpdated: (state, action) => {
+    //   console.log('INCOMING CONTACT', action.payload); // debug log
+    //   const { id, changes } = action.payload;
+    //   contactsAdapter.updateOne(state, { id, changes }); // taking in params, not destructuring
+    //   console.log(' UPDATED STATE.entities HERE ', state.entities);
+    // },
   },
 });
 
