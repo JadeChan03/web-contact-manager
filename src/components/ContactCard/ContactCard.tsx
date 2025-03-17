@@ -49,6 +49,7 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
       <Typography>{`${firstName} ${lastName}`}</Typography>
       <ul>
         {phones.map((phone, index) => (
+          // *** will have to change this when changing phones data shape!!!! ***
           <li key={index}>{phone.value}</li>
         ))}
       </ul>
