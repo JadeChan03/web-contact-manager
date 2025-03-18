@@ -109,7 +109,6 @@
 //             <Input
 //               /* TODO - make number field, validate is number but account for "+" */
 //               {...field}
-//               error={!!fieldState.error}
 //               value={displayValue}
 //               placeholder={`Add phone number`}
 //               onChange={(e) => {

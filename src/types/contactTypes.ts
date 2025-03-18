@@ -4,11 +4,7 @@ export interface Contact {
   id: EntityId;
   firstName: string;
   lastName: string;
-  phones: {
-    id: string;
-    phone: string; // full E.164 number, ie. +18880001111
-    countryCode: string; // ISO country code, ie. 'CA'
-  }[];
+  phones: Phone[];
   emails: {
     id: string;
     email: string;
@@ -35,19 +31,12 @@ export interface Contact {
     tag: string;
   }[];
 }
-// export interface Contact {
-// 	id: EntityId;
-// 	firstName: string;
-// 	lastName: string;
-// 	phones: {id: string, value: string}[];
-// 	emails: {id: string, value: string}[];
-// 	addresses: {id: string, value: string}[];
-// 	categories: {id: string, value: string}[];
-// 	organisation: string;
-// 	webUrl: string;
-// 	notes: string;
-// 	tags: {id: string, value: string}[];
-// }
+export interface Phone {
+  id: string; // index of phone object in phones array
+  phone: string;
+  countryCode: string;
+}
+
 
 // note:
 // using interface declaration will create an identity (interface name) in compiler errors

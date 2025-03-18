@@ -6,32 +6,56 @@ import {
   EntityId,
 } from '@reduxjs/toolkit';
 import { type RootState } from '../types';
-// import { type Contact } from '../../types/contactTypes';
+import { type Contact } from '../../types/contactTypes';
+import { nanoid } from 'nanoid';
+import { type CountryCode  } from 'libphonenumber-js';
+import { formatToE164 } from '../../utils/phones';
 
-// source: https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#converting-the-todos-reducer
 // creates an "adapter" object that contains premade reducer functions
-// functions can be used as case reducers inside of createSlice
-const contactsAdapter = createEntityAdapter();
-const initialState = contactsAdapter.getInitialState({
-  ids: [] as EntityId[],
-  entities: {},
-});
-// getInitialState returns an object that looks like: {ids: [], entities: {}}
+const contactsAdapter = createEntityAdapter<Contact>();
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState,
+  initialState: contactsAdapter.getInitialState(), // returns {ids: [], entities: {}}
   reducers: {
-    contactAdded: contactsAdapter.addOne,
-    // use an adapter reducer function to remove a contact by ID
-    contactDeleted: contactsAdapter.removeOne,
-    contactUpdated: contactsAdapter.updateOne
-    // contactUpdated: (state, action) => {
-    //   console.log('INCOMING CONTACT', action.payload); // debug log
-    //   const { id, changes } = action.payload;
-    //   contactsAdapter.updateOne(state, { id, changes }); // taking in params, not destructuring
-    //   console.log(' UPDATED STATE.entities HERE ', state.entities);
-    // },
+    contactAdded: {
+      reducer: contactsAdapter.addOne,
+      prepare: (contact: Omit<Contact, 'id'>) => {
+        // validate and format phone numbers before adding
+        const formattedPhones = contact.phones.map(phone => ({
+          ...phone,
+          phone: formatToE164(phone.phone, phone.countryCode as CountryCode),
+        }));
+
+        return {
+          payload: {
+            ...contact,
+            id: nanoid(),
+            phones: formattedPhones
+          }
+        }; // TODO - removeMany
+      }
+    },
+    contactUpdated: {
+      reducer: contactsAdapter.updateOne,
+      prepare: (id: EntityId, changes: Partial<Contact>) => {
+        // formate phone numbers before updating
+        if(changes.phones) {
+          changes.phones = changes.phones.map(phone => ({
+            ...phone,
+            number: formatToE164(phone.phone, phone.countryCode as CountryCode) // **** WRITE THE FUNCITONASDJLKASDJKASNDKLS
+          }));
+        }
+
+        return {
+          payload: {
+            id,
+            changes
+          }
+        };
+      }
+    },
+    contactDeleted: contactsAdapter.removeOne, // TODO - removeMany
   },
 });
 
@@ -42,7 +66,6 @@ export const { contactAdded, contactDeleted, contactUpdated } =
 export default contactsSlice.reducer;
 
 /* SELECTORS */
-
 const contactsSelectors = contactsAdapter.getSelectors<RootState>(
   (state) => state.contacts
 );
@@ -55,3 +78,5 @@ export const selectTodoIds = createSelector(
   // and returns a final result value
   (contacts) => contacts.map((contact) => contact.id)
 );
+
+// source: https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#converting-the-todos-reducer

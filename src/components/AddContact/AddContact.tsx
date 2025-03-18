@@ -1,271 +1,177 @@
 import { useState } from 'react';
-import { useForm, useFieldArray, Control } from 'react-hook-form';
+import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
-import { type Contact } from '../../types/contactTypes';
-type ContactField = keyof Contact;
+import { type Contact, type Phone } from '../../types/contactTypes';
 import { PhoneInput } from '../PhoneInput/PhoneInput';
 import {
-  Textarea,
+  parsePhoneNumberFromString as parsePhoneNumber,
+  // type CountryCallingCode,
+  type CountryCode,
+} from 'libphonenumber-js';
+import { NotesInput } from '../NotesInput/NotesInput';
+import {
+  // Textarea,
   Card,
   Button,
   Typography,
   Input,
-  FormControl,
-  FormHelperText,
+  // FormControl,
+  // FormHelperText,
   Box,
+  IconButton,
+  Stack,
 } from '@mui/joy';
-import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-import IconButton from '@mui/joy/IconButton';
-import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
   const [visibility, setVisibility] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    register,
-    reset,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm<Contact>({
+  /* CREATE REACT HOOK FORM  */
+  const methods = useForm<Contact>({
     defaultValues: {
       id: nanoid(),
       firstName: '',
       lastName: '',
-      phones: [{ id: nanoid(), value: '' }],
-      emails: [{ id: nanoid(), value: '' }],
-      addresses: [{ id: nanoid(), value: '' }],
-      categories: [{ id: nanoid(), value: '' }],
+      phones: [{ id: nanoid(), phone: '', countryCode: '' } as Phone],
+      emails: [{ id: nanoid(), email: '' }],
+      addresses: [{ id: nanoid(), addr1: '', addr2: '' }],
+      categories: [{ id: nanoid(), category: '' }],
       organisation: '',
       webUrl: '',
       notes: '',
-      tags: [{ id: nanoid(), value: '' }],
+      tags: [{ id: nanoid(), tag: '' }],
     },
   });
 
-  // watch notes inputs for change
-  const notesValue = watch('notes', '');
+  const { control, handleSubmit, reset, register, formState: { errors } } = methods;
 
-  // field arrays for dynamic inputs
+  /* FIELD ARRAYS FOR DYNAMIC INPUTS */
+  // phones
   const {
     fields: phoneFields,
-    append: appendPhone,
-    remove: removePhone,
-  } = useFieldArray({
-    control,
-    name: 'phones',
-  });
-
-  // phones -------------------
-
-  const createInput = (
-    fieldName: ContactField,
-    label: string,
-    control: Control<Contact>,
-    field: { id: string; value: string; countryCode?: string },
-    index: number
-  ) => {
-    switch (fieldName) {
-      case 'phones':
-        return (
-          <PhoneInput
-            fieldName={fieldName}
-            index={index}
-            control={control}
-            defaultValue={field.value}
-          />
-        );
-      case 'addresses':
-        return (
-          <Input
-            {...control.register(`${fieldName}.${index}.value`)}
-            placeholder={`add ${label}`}
-            defaultValue={field.value}
-          />
-        );
-      case 'emails':
-        return (
-          <Input
-            {...control.register(`${fieldName}.${index}.value`)}
-            placeholder={`add ${label}`}
-            defaultValue={field.value}
-          />
-        );
-      case 'categories':
-        return (
-          <Input
-            {...control.register(`${fieldName}.${index}.value`)}
-            placeholder={`add ${label}`}
-            defaultValue={field.value}
-          />
-        );
-      case 'tags':
-        return (
-          <Input
-            {...control.register(`${fieldName}.${index}.value`)}
-            placeholder={`add ${label}`}
-            defaultValue={field.value}
-          />
-        );
-    }
-  };
-
-  const renderDynamicInputs = (
-    fields: { id: string; value: string }[],
-    fieldName: keyof Contact,
-    label: string,
-    append: () => void,
-    remove: (index: number) => void,
-    control: Control<Contact>
-  ) => {
-    return (
-      <>
-        {fields.map((field, index) => (
-          <Box key={field.id} sx={{ display: 'flex' }}>
-            {createInput(fieldName, label, control, field, index)}
-
-            {/* display ADD button instead of REMOVE on input element */}
-            {index === fields.length - 1 && fields.length > 1 ? (
-              <IconButton
-                aria-label="Remove Input"
-                onClick={() => remove(index)}
-                variant="outlined"
-              >
-                <RemoveIcon />
-              </IconButton>
-            ) : (
-              <IconButton
-                aria-label="Add Input"
-                onClick={append}
-                variant="outlined"
-              >
-                <AddIcon />
-              </IconButton>
-            )}
-          </Box>
-        ))}
-      </>
-    );
-  };
-
-  const toggleForm = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setVisibility(!visibility);
-    reset();
-  };
+    append,
+    remove,
+  } = useFieldArray({ control, name: 'phones' });
+  //   // emails
+  //   const {emails: emailFields, append, remove} = useFieldArray({control, name: 'emails'})
+  //   // addresses
+  //   const { addresses: addressFields, append, remove} = useFieldArray({control, 'addresses'});
+  // categories
+  //   const {fields: categoryFields, append, remove} = useFieldArray({control, name: 'categories'})
+  //   // tags
+  //   const {fields: tagFields, append, remove} = useFieldArray({control, name: 'tags'})
 
   const onSubmit = (data: Contact) => {
-    const newContact = { ...data, id: nanoid() };
-    console.log('newContact ', newContact);
+    console.log('data ', data);
+    console.log('data.phones ', data.phones);
+    console.log('data.notes ', data.notes);
+
+    const newContact = {
+      ...data,
+      phones: data.phones.map((phoneObj) => ({
+        ...phoneObj,
+        phone:
+          parsePhoneNumber(
+            phoneObj.phone,
+            phoneObj.countryCode as CountryCode
+          )?.format('E.164') || phoneObj.phone,
+      })),
+    };
     dispatch(contactAdded(newContact));
     setVisibility(false);
     reset();
   };
 
-  const handleCharLimit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = e.target;
-    /* CHARACTER LIMIT*/
-    if (value.length <= 200) {
-      setValue('notes', value);
-    }
-  };
-
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box
+      role={'presentation'}
+      sx={{ display: 'flex', justifyContent: 'center' }}
+    >
       {visibility ? (
-        /* ---- form component ---- */
-        <Card
-          sx={{
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'end',
-            justifyContent: 'start',
-            border: '1px solid grey',
-          }}
-        >
-          <IconButton onClick={toggleForm}>
+        <Card sx={{ p: 5, width: 500 }}>
+          <IconButton onClick={() => setVisibility(false)} sx={{ ml: 'auto' }}>
             <CloseIcon />
           </IconButton>
+          {/* ------------------------- FORM SECTION ---------------------- */}
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2}>
+                {/* FIRST NAME */}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box>
+                    <Input
+                      {...register('firstName', {
+                        required: 'First name is required',
+                      })}
+                      placeholder="First name"
+                      error={!!errors.firstName}
+                      sx={{ width: 200 }}
+                    />
+                    {errors.firstName && (
+                      <Typography color="danger">
+                        {errors.firstName.message}
+                      </Typography>
+                    )}
+                  </Box>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Box>
-              {/* first name */}
-              <>
-                <Input
-                  {...register('firstName', {
-                    required: 'First name is required',
-                  })}
-                  className={errors.firstName ? 'error' : ''}
-                  placeholder="First name"
-                  variant="outlined"
-                />
-                {errors?.firstName && <span>{errors.firstName.message}</span>}
-              </>
+                  {/* LAST NAME */}
+                  <Box>
+                    <Input
+                      {...register('lastName', {
+                        required: 'Last name is required',
+                      })}
+                      placeholder="Last name"
+                      error={!!errors.lastName}
+                      sx={{ width: 200 }}
+                    />
+                    {errors.lastName && (
+                      <Typography color="danger">
+                        {errors.lastName.message}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+                {/* PHONES */}
+                {phoneFields.map((field, index) => (
+                  <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                    <PhoneInput index={index} />
 
-              {/* last name */}
-              <>
-                <Input
-                  {...register('lastName', {
-                    required: 'Last name is required',
-                  })}
-                  className={errors.lastName ? 'error' : ''}
-                  placeholder="Last name"
-                  variant="outlined"
-                />
-                {errors?.lastName && <span>{errors.lastName.message}</span>}
-              </>
-            </Box>
+                    {index === phoneFields.length - 1 ? (
+                      <IconButton
+                        onClick={() =>
+                          append({ id: nanoid(), phone: '', countryCode: '' })
+                        }
+                      >
+                        <AddIcon fontSize="small"></AddIcon>
+                      </IconButton>
+                    ) : (
+                      <IconButton onClick={() => remove(index)}>
+                        <RemoveIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+              {/* NOTES */}
+              <NotesInput maxLength={200} placeholder="Enter notes" />
 
-            {/* phone numbers */}
-            <div>
-              {renderDynamicInputs(
-                phoneFields,
-                'phones',
-                'phone',
-                () => appendPhone({ id: nanoid(), value: '' }),
-                removePhone,
-                control
-              )}
-            </div>
-
-            {/* notes */}
-            <FormControl error={notesValue.length >= 200 ? true : false}>
-              <Textarea
-                {...register('notes')}
-                className={errors.notes ? 'error' : ''}
-                placeholder="add notes"
-                endDecorator={
-                  <Typography level="body-xs" sx={{ ml: 'auto' }}>
-                    {notesValue.length} character(s)
-                  </Typography>
-                }
-                value={notesValue}
-                onChange={handleCharLimit}
-              />
-              {notesValue.length >= 200 && (
-                <FormHelperText>
-                  <InfoOutlined />
-                  Character limit reached
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <Button type="submit" variant="outlined">
-              Submit form
-            </Button>
-          </form>
+              {/* SUBMIT BTN */}
+              <Button type="submit" variant="outlined">
+                Save Contact
+              </Button>
+            </form>
+          </FormProvider>
+          {/* ------------------------- END FORM SECTION ---------------------- */}
         </Card>
       ) : (
-        <Button onClick={toggleForm} variant="outlined">
-          Add new contact
+        <Button onClick={() => setVisibility(true)} variant="outlined">
+          {' '}
+          Add New Contact
         </Button>
       )}
     </Box>
