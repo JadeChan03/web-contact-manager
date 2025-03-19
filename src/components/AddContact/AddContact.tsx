@@ -3,11 +3,10 @@ import { useForm, useFieldArray, FormProvider, UseFieldArrayAppend } from 'react
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
-import { type Contact, type Phone } from '../../types/contactTypes';
+import { Contact, Phone, Email, Address, Category, Tag } from '../../types/contactTypes';
 import { PhoneInput } from '../PhoneInput/PhoneInput';
 import {
   parsePhoneNumberFromString as parsePhoneNumber,
-  // type CountryCallingCode,
   type CountryCode,
 } from 'libphonenumber-js';
 import { NotesInput } from '../NotesInput/NotesInput';
@@ -24,28 +23,26 @@ import {
   Stack,
 } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
-// import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import {AddField, RemoveField} from '../Buttons/Buttons';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
   const [visibility, setVisibility] = useState(false);
 
-  /* CREATE REACT HOOK FORM  */
+  /* ----- CREATE REACT HOOK FORM -----  */
   const methods = useForm<Contact>({
     defaultValues: {
       id: nanoid(),
       firstName: '',
       lastName: '',
       phones: [{ id: nanoid(), phone: '', countryCode: '' } as Phone],
-      emails: [{ id: nanoid(), email: '' }],
-      addresses: [{ id: nanoid(), addr1: '', addr2: '' }],
-      categories: [{ id: nanoid(), category: '' }],
+      emails: [{ id: nanoid(), email: '' } as Email],
+      addresses: [{ id: nanoid(), addr1: '', addr2: '' } as Address],
+      categories: [{ id: nanoid(), category: '' } as Category],
       organisation: '',
       webUrl: '',
       notes: '',
-      tags: [{ id: nanoid(), tag: '' }],
+      tags: [{ id: nanoid(), tag: '' } as Tag],
     },
   });
 

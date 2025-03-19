@@ -5,7 +5,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { nanoid } from 'nanoid';
 import { type Contact, Phone } from '../../types/contactTypes';
 type ContactField = keyof Contact;
-type ContactInput = Contact[ContactField];
+// type ContactInput = Contact[ContactField];
 
 import { UseFieldArrayRemove, UseFieldArrayAppend } from 'react-hook-form';
 import React from 'react';
