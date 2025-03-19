@@ -26,7 +26,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 // import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import {AddField} from '../Buttons/Buttons';
+import {AddField, RemoveField} from '../Buttons/Buttons';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
@@ -149,9 +149,7 @@ export const AddContact = () => {
                     <PhoneInput index={index} />
 
                     {/* remove button */}
-                    <IconButton onClick={() => remove(index)}>
-                      <RemoveIcon fontSize="small" />
-                    </IconButton>
+                    <RemoveField index={index} remove={remove}/>
                   </Box>
                 ))}
                 {/* add button */}

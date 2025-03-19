@@ -1,13 +1,14 @@
 import { IconButton } from '@mui/joy';
 // import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-// import RemoveIcon from '@mui/icons-material/Remove';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { nanoid } from 'nanoid';
 import { type Contact, Phone } from '../../types/contactTypes';
 type ContactField = keyof Contact;
 type ContactInput = Contact[ContactField];
 
-import { type UseFieldArrayAppend } from 'react-hook-form';
+import { UseFieldArrayRemove, UseFieldArrayAppend } from 'react-hook-form';
+import React from 'react';
 
 interface AddFieldProps {
   index?: number;
@@ -39,3 +40,14 @@ export const AddField: React.FunctionComponent<AddFieldProps> = ({
     </>
   );
 };
+
+interface RemoveFieldProps {
+  index: number;
+  remove: UseFieldArrayRemove;
+}
+
+export const RemoveField: React.FunctionComponent<RemoveFieldProps>  = ({index, remove}) => (
+  <IconButton onClick={() => remove(index)}>
+    <RemoveIcon fontSize="small" />
+  </IconButton>
+);
