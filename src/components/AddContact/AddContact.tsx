@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
+import { useForm, useFieldArray, FormProvider, UseFieldArrayAppend } from 'react-hook-form';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
@@ -24,8 +24,9 @@ import {
   Stack,
 } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
+// import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import {AddField} from '../Buttons/Buttons';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
@@ -48,7 +49,13 @@ export const AddContact = () => {
     },
   });
 
-  const { control, handleSubmit, reset, register, formState: { errors } } = methods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    register,
+    formState: { errors },
+  } = methods;
 
   /* FIELD ARRAYS FOR DYNAMIC INPUTS */
   // phones
@@ -141,22 +148,15 @@ export const AddContact = () => {
                   <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
                     <PhoneInput index={index} />
 
-                    {index === phoneFields.length - 1 ? (
-                      <IconButton
-                        onClick={() =>
-                          append({ id: nanoid(), phone: '', countryCode: '' })
-                        }
-                      >
-                        <AddIcon fontSize="small"></AddIcon>
-                      </IconButton>
-                    ) : (
-                      <IconButton onClick={() => remove(index)}>
-                        <RemoveIcon fontSize="small" />
-                      </IconButton>
-                    )}
+                    {/* remove button */}
+                    <IconButton onClick={() => remove(index)}>
+                      <RemoveIcon fontSize="small" />
+                    </IconButton>
                   </Box>
                 ))}
-              </Stack>
+                {/* add button */}
+                <AddField fieldName={'phones'} append={append as UseFieldArrayAppend<Contact, "phones">}/>
+
               {/* NOTES */}
               <NotesInput maxLength={200} placeholder="Enter notes" />
 
@@ -164,6 +164,7 @@ export const AddContact = () => {
               <Button type="submit" variant="outlined">
                 Save Contact
               </Button>
+              </Stack>
             </form>
           </FormProvider>
           {/* ------------------------- END FORM SECTION ---------------------- */}

@@ -25,15 +25,15 @@ export const NotesInput: React.FunctionComponent<NotesInputProps> = ({
   // local 'notes' input value state, neccesarry for rendering current input in component
   const [localNotes, setLocalNotes] = useState(notesValue);
 
-  console.log('localNotes ', localNotes);
-  console.log('notesValue ', notesValue);
+  // console.log('localNotes ', localNotes);
+  // console.log('notesValue ', notesValue);
 
   const handleChange = (
     e: ChangeEvent<HTMLTextAreaElement>,
     field: FieldValues
   ) => {
     const { value } = e.target;
-    console.log('value ', value);
+    // console.log('value ', value);
     const newValue =
       value.length <= maxLength ? value : value.slice(0, maxLength);
 

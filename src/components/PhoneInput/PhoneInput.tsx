@@ -30,15 +30,15 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
 }) => {
   // destructure methods from AddContact form
   const { control, watch, setValue } = useFormContext<Contact>();
-  console.log('control ', control);
 
-  // LOCAL STATES FOR COUNTRY CODE AND DIAL CODE
+  // LOCAL STATES
   const [countryCode, setCountryCode] = useState(''); // ie. 'US'
   const [countryDialCode, setCountryDialCode] = useState(''); // ie. '+1'
+  const [displayValue, setDisplayValue] = useState(''); // display in UIwithout country code
 
   // WATCH REACT HOOK FORM FIELDS
   const selectedCountryCode = watch(`phones.${index}.countryCode`);
-  const phoneValue = watch(`phones.${index}.phone`);
+  // const phoneValue = watch(`phones.${index}.phone`);
 
   // FETCH COUNTRY CODES DATA (with custom hook)
   const countryCodeData: countryCodeData[] = useCountryCodeData();
@@ -51,8 +51,9 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
   ) => {
     // update countryCode state onChange ie. 'US'
     // setCountryCode(value);
-    console.log('value ', value);
+    // console.log('value ', value);
     //validate countryCode, returns countryCodeData object {name, dial_code, code}
+
     const countryObj = countryCodeData.find((c) => c.code === value);
     console.log('countryObj ', countryObj);
     // if valid, update LOCAL country code and dial code state
@@ -68,38 +69,53 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
     e: React.ChangeEvent<HTMLInputElement>,
     field: { onChange: (value: string) => void }
   ) => {
-    let { value } = e.target;
+    let displayVal = e.target.value;
 
-    // prevent modification of country dial code
-    if (!value.startsWith(countryDialCode)) {
-      value = countryDialCode + value.replace(/[^\d]/g, '');
-    }
+    // // prevent modification of country dial code
+    // if (!value.startsWith(countryDialCode)) {
+    //   value = countryDialCode + value.replace(/[^\d]/g, '');
+    // }
+
     // allow only numbers and "+" character from country code
-    value =
-      countryDialCode +
-      value.replace(countryDialCode, '').replace(/[^\d]/g, ''); // removes non-digits
+    // value =
+    //   countryDialCode +
+    //   value.replace(countryDialCode, '').replace(/[^\d]/g, ''); // removes non-digits
+    displayVal = displayVal.replace(/[^\d]/g, '');
 
-    // prevent exceeding max length
-    const phoneNumber = parsePhoneNumber(value, countryCode as CountryCode);
-    const maxLength = phoneNumber?.country?.length || 15;
-    if (value.length > countryDialCode.length + maxLength) return;
-
-    // update phone field in form state
-    setValue(`phones.${index}.phone`, value);
-    // update field value with updated value
-    field.onChange(value);
+    const phoneNumber = parsePhoneNumber(
+      displayVal,
+      countryCode as CountryCode
+    );
+    // console.log('phoneNumber ', phoneNumber)
+    if (phoneNumber) {
+      // prevent exceeding maxLength
+      const maxLength = phoneNumber.nationalNumber.length;
+      if (displayVal.length > countryDialCode.length + maxLength) return;
+      // set states with formatted number
+      setDisplayValue(phoneNumber.nationalNumber); // update NATIONAL number to displayVal state
+      setValue(`phones.${index}.phone`, phoneNumber.nationalNumber); // update NATIONAL number to FIELD state
+      field.onChange(phoneNumber.number); // register INTERNATIONAL number to (react hook) FORM state 
+    } else {
+      const maxLength = 15;
+      if(displayVal.length > countryDialCode.length + maxLength) return
+      setDisplayValue(displayVal);
+      setValue(`phones.${index}.phone`, displayVal);
+    }
   };
+
 
   // PRESERVE DIAL CODE IN PHONE INPUT FIELD
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // prevent backspace if it deletes dial code
-    if (e.key === 'Backspace' && phoneValue?.length <= countryDialCode.length) {
-      e.preventDefault();
-    }
-  };
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   // prevent backspace if it deletes dial code
+  //   if (e.key === 'Backspace' && phoneValue?.length <= countryDialCode.length) {
+  //     e.preventDefault();
+  //   }
+  // };
 
   // PHONE INPUT VALIDATION
   const validatePhoneNumber = (value: string) => {
+    // note: allow users to input custom number w/o country code and validation?
+
     // validate country selection
     if (!selectedCountryCode) return 'Country code is required';
     // validate phone number via libphonenumber method
@@ -108,22 +124,28 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
   };
 
   return (
-    <Box sx={{ minWidth: 200, display: 'flex', gap: 2 }}>
+    <Box sx={{ minWidth: 375, display: 'flex', gap: 2 }}>
       {/* COUNTRY CODE SELECTOR */}
-      <Box sx={{ width: 500 }}>
+      <Box>
         <Select
           value={countryCode}
+          // placeholder={''}
           onChange={handleCountryChange}
           startDecorator={<LanguageIcon />}
           slotProps={{
             listbox: {
               placement: 'bottom-start',
-              sx: { width: 50 },
+              sx: { maxWidth: 50 },
             },
           }}
+          sx={{ minWidth: 120 }}
         >
           {countryCodeData.map((country: countryCodeData) => (
-            <Option key={country.code} value={country.code}>
+            <Option
+              key={country.code}
+              value={country.code}
+              label={country.dial_code}
+            >
               {country.name} ({country.dial_code})
             </Option>
           ))}
@@ -142,15 +164,15 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
           <FormControl error={!!fieldState.error}>
             <Input
               {...field}
-              value={phoneValue}
+              value={displayValue}
               type="tel"
               placeholder="Enter phone number"
               onChange={(e) => handlePhoneChange(e, field)}
-              onKeyDown={handleKeyDown}
+              // onKeyDown={handleKeyDown}
               error={
                 !!fieldState.error
               } /** same as fieldState.error ? true : false **/
-              sx={{ width: 275 }}
+              sx={{ minWidth: 240 }}
             />
             {fieldState.error && (
               <FormHelperText>
