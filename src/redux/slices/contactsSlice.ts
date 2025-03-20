@@ -3,13 +3,12 @@ import {
   createEntityAdapter,
   createSelector,
   // EntityAdapter,
-  EntityId,
+  // EntityId,
 } from '@reduxjs/toolkit';
 import { type RootState } from '../types';
 import { type Contact } from '../../types/contactTypes';
-import { nanoid } from 'nanoid';
-import { type CountryCode  } from 'libphonenumber-js';
-import { formatToE164 } from '../../utils/phones';
+// import { nanoid } from 'nanoid';
+// import { type CountryCode  } from 'libphonenumber-js';
 
 // creates an "adapter" object that contains premade reducer functions
 const contactsAdapter = createEntityAdapter<Contact>();
@@ -18,43 +17,10 @@ const contactsSlice = createSlice({
   name: 'contacts',
   initialState: contactsAdapter.getInitialState(), // returns {ids: [], entities: {}}
   reducers: {
-    contactAdded: {
-      reducer: contactsAdapter.addOne,
-      prepare: (contact: Omit<Contact, 'id'>) => {
-        // validate and format phone numbers before adding
-        const formattedPhones = contact.phones.map(phone => ({
-          ...phone,
-          phone: formatToE164(phone.phone, phone.countryCode as CountryCode),
-        }));
-
-        return {
-          payload: {
-            ...contact,
-            id: nanoid(),
-            phones: formattedPhones
-          }
-        }; // TODO - removeMany
-      }
-    },
-    contactUpdated: {
-      reducer: contactsAdapter.updateOne,
-      prepare: (id: EntityId, changes: Partial<Contact>) => {
-        // formate phone numbers before updating
-        if(changes.phones) {
-          changes.phones = changes.phones.map(phone => ({
-            ...phone,
-            number: formatToE164(phone.phone, phone.countryCode as CountryCode) // **** WRITE THE FUNCITONASDJLKASDJKASNDKLS
-          }));
-        }
-
-        return {
-          payload: {
-            id,
-            changes
-          }
-        };
-      }
-    },
+    contactAdded: contactsAdapter.addOne,
+      
+    contactUpdated: contactsAdapter.updateOne,
+    
     contactDeleted: contactsAdapter.removeOne, // TODO - removeMany
   },
 });

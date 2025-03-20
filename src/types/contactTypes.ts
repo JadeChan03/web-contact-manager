@@ -2,15 +2,15 @@ import { EntityId } from '@reduxjs/toolkit';
 
 export interface Contact {
   id: EntityId;
-  firstName: string;
-  lastName: string;
+  firstName: string; // SINGLE INPUT, 
+  lastName: string; // SINGLE INPUT
   phones: Phone[];
-  emails:Email[];
+  emails:Email[]; 
   addresses: Address[];
   categories: Category[];
-  organisation: string;
-  webUrl: string;
-  notes: string;
+  organisation: string; // SINGLE INPUT
+  webUrl: string; // SINGLE INPUT
+  notes: string; // SINGLE INPUT, custom component
   tags: Tag[];
 }
 

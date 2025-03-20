@@ -9,7 +9,6 @@ import {
 } from '@mui/joy';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
-// import CallIcon from '@mui/icons-material/Call';
 import {
   parsePhoneNumberFromString as parsePhoneNumber,
   // type CountryCallingCode,
@@ -28,23 +27,23 @@ interface PhoneInputProps {
 export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
   index,
 }) => {
-  // destructure methods from AddContact form
+  /* --- destructure methods from AddContact form --- */
   const { control, watch, setValue } = useFormContext<Contact>();
 
-  // LOCAL STATES
+  /* --- LOCAL STATES --- */
   const [countryCode, setCountryCode] = useState(''); // ie. 'US'
   const [countryDialCode, setCountryDialCode] = useState(''); // ie. '+1'
   const [displayValue, setDisplayValue] = useState(''); // display in UIwithout country code
 
-  // WATCH REACT HOOK FORM FIELDS
+  /* --- WATCH REACT HOOK FORM FIELDS --- */
   const selectedCountryCode = watch(`phones.${index}.countryCode`);
   // const phoneValue = watch(`phones.${index}.phone`);
 
-  // FETCH COUNTRY CODES DATA (with custom hook)
+  /* --- FETCH COUNTRY CODES DATA (with custom hook) --- */
   const countryCodeData: countryCodeData[] = useCountryCodeData();
   // console.log('countryCodesData in PhoneInput ', countryCodeData);
 
-  // HANDLE COUNTRY SELECTOR CHANGE
+  /* --- HANDLE COUNTRY SELECTOR CHANGE --- */
   const handleCountryChange = (
     e: React.SyntheticEvent | null,
     value: string | null
@@ -64,55 +63,48 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
     }
   };
 
-  // HANDLE PHONE INPUT CHANGE
+  /* --- HANDLE PHONE INPUT CHANGE --- */
   const handlePhoneChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     field: { onChange: (value: string) => void }
   ) => {
     let displayVal = e.target.value;
 
-    // // prevent modification of country dial code
-    // if (!value.startsWith(countryDialCode)) {
-    //   value = countryDialCode + value.replace(/[^\d]/g, '');
-    // }
-
-    // allow only numbers and "+" character from country code
-    // value =
-    //   countryDialCode +
-    //   value.replace(countryDialCode, '').replace(/[^\d]/g, ''); // removes non-digits
+    // remove non-digits
     displayVal = displayVal.replace(/[^\d]/g, '');
 
+    // validate phone number
     const phoneNumber = parsePhoneNumber(
       displayVal,
       countryCode as CountryCode
     );
-    // console.log('phoneNumber ', phoneNumber)
+    // console.log('phoneNumber', phoneNumber);
     if (phoneNumber) {
-      // prevent exceeding maxLength
+      // prevent exceeding maxLength, TODO - consider making helper function so logic is reusable
       const maxLength = phoneNumber.nationalNumber.length;
-      if (displayVal.length > countryDialCode.length + maxLength) return;
+      if (displayVal.length > countryDialCode.length + maxLength) return; // 
+
       // set states with formatted number
       setDisplayValue(phoneNumber.nationalNumber); // update NATIONAL number to displayVal state
       setValue(`phones.${index}.phone`, phoneNumber.nationalNumber); // update NATIONAL number to FIELD state
-      field.onChange(phoneNumber.number); // register INTERNATIONAL number to (react hook) FORM state 
+      
+      // note: these return the same formats
+      console.log('format to E.164 ', phoneNumber.format('E.164')) // chosen for readability
+      console.log('format to number ', phoneNumber.number)
+
+      field.onChange(phoneNumber.format('E.164')); // register INTERNATIONAL number to (react hook) FORM state
     } else {
       const maxLength = 15;
-      if(displayVal.length > countryDialCode.length + maxLength) return
+      // prevent exceeding maxLength
+      if (displayVal.length > countryDialCode.length + maxLength) return;
+
+      // set states with formatted number
       setDisplayValue(displayVal);
       setValue(`phones.${index}.phone`, displayVal);
     }
   };
 
-
-  // PRESERVE DIAL CODE IN PHONE INPUT FIELD
-  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   // prevent backspace if it deletes dial code
-  //   if (e.key === 'Backspace' && phoneValue?.length <= countryDialCode.length) {
-  //     e.preventDefault();
-  //   }
-  // };
-
-  // PHONE INPUT VALIDATION
+  /* --- PHONE INPUT VALIDATION --- */
   const validatePhoneNumber = (value: string) => {
     // note: allow users to input custom number w/o country code and validation?
 
@@ -176,7 +168,7 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
             />
             {fieldState.error && (
               <FormHelperText>
-                <InfoOutlined />
+                <InfoOutlined sx={{ mr: 1 }} />
                 {fieldState.error.message}
               </FormHelperText>
             )}

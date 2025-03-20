@@ -8,7 +8,7 @@ import { Link as RouterLink } from 'react-router';
 import { EntityId } from '@reduxjs/toolkit';
 
 import IconButton from '@mui/joy/IconButton';
-import { Card, CardContent, Typography } from '@mui/joy';
+import { Card, CardContent, Typography} from '@mui/joy'; // TODO - style alert, <Alert/>
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -45,17 +45,40 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
   };
 
   return (
-    <Card className="contact-card">
-      <Typography>{`${firstName} ${lastName}`}</Typography>
-      <ul>
-        {phones.map((phone, index) => (
-          // *** will have to change this when changing phones data shape!!!! ***
-          <li key={index}>{phone.value}</li>
+    <Card
+      sx={{
+        p: 3,
+        width: 200,
+        position: 'relative',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      ></div>
+      <Typography sx={{ mb: 1 }}>{`${firstName} ${lastName}`}</Typography>
+      <>
+        {phones.map((phoneObj, index) => (
+          <div key={index}>{phoneObj.phone}</div>
         ))}
-      </ul>
+      </>
+
       <CardContent>
-        <IconButton onClick={handleDeleteCard} variant="outlined"><DeleteIcon/></IconButton>
-          <IconButton component={RouterLink} to={`/contact/${id}`} variant="outlined"><EditIcon /></IconButton>
+        <IconButton onClick={handleDeleteCard} variant="outlined">
+          <DeleteIcon />
+        </IconButton>
+        <IconButton
+          component={RouterLink}
+          to={`/contact/${id}`}
+          variant="outlined"
+        >
+          <EditIcon />
+        </IconButton>
       </CardContent>
     </Card>
   );

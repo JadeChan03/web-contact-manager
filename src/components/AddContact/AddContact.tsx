@@ -1,29 +1,31 @@
 import { useState } from 'react';
-import { useForm, useFieldArray, FormProvider, UseFieldArrayAppend } from 'react-hook-form';
+import {
+  useForm,
+  useFieldArray,
+  FormProvider,
+  UseFieldArrayAppend,
+} from 'react-hook-form';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
-import { Contact, Phone, Email, Address, Category, Tag } from '../../types/contactTypes';
+import {
+  Contact,
+  Phone,
+  Email,
+  Address,
+  Category,
+  Tag,
+} from '../../types/contactTypes';
+import { AddField, RemoveField } from '../Buttons/Buttons';
+import { SingleInput } from '../SingleInput/SingleInput';
 import { PhoneInput } from '../PhoneInput/PhoneInput';
 import {
   parsePhoneNumberFromString as parsePhoneNumber,
   type CountryCode,
 } from 'libphonenumber-js';
 import { NotesInput } from '../NotesInput/NotesInput';
-import {
-  // Textarea,
-  Card,
-  Button,
-  Typography,
-  Input,
-  // FormControl,
-  // FormHelperText,
-  Box,
-  IconButton,
-  Stack,
-} from '@mui/joy';
+import { Card, Button, Box, IconButton, Stack } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
-import {AddField, RemoveField} from '../Buttons/Buttons';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
@@ -46,13 +48,7 @@ export const AddContact = () => {
     },
   });
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    register,
-    formState: { errors },
-  } = methods;
+  const { control, handleSubmit, reset } = methods;
 
   /* FIELD ARRAYS FOR DYNAMIC INPUTS */
   // phones
@@ -101,64 +97,42 @@ export const AddContact = () => {
           <IconButton onClick={() => setVisibility(false)} sx={{ ml: 'auto' }}>
             <CloseIcon />
           </IconButton>
-          {/* ------------------------- FORM SECTION ---------------------- */}
+          {/* ------------------------- FORM SECTION -------------------------- */}
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={2}>
-                {/* FIRST NAME */}
+                {/* --- FIRST/LAST NAME --- */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box>
-                    <Input
-                      {...register('firstName', {
-                        required: 'First name is required',
-                      })}
-                      placeholder="First name"
-                      error={!!errors.firstName}
-                      sx={{ width: 200 }}
-                    />
-                    {errors.firstName && (
-                      <Typography color="danger">
-                        {errors.firstName.message}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* LAST NAME */}
-                  <Box>
-                    <Input
-                      {...register('lastName', {
-                        required: 'Last name is required',
-                      })}
-                      placeholder="Last name"
-                      error={!!errors.lastName}
-                      sx={{ width: 200 }}
-                    />
-                    {errors.lastName && (
-                      <Typography color="danger">
-                        {errors.lastName.message}
-                      </Typography>
-                    )}
-                  </Box>
+                  <SingleInput fieldName="firstName" placeholder="First name" />
+                  <SingleInput fieldName="lastName" placeholder="Last name" />
                 </Box>
-                {/* PHONES */}
+                {/* --- PHONES --- */}
                 {phoneFields.map((field, index) => (
                   <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
                     <PhoneInput index={index} />
-
-                    {/* remove button */}
-                    <RemoveField index={index} remove={remove}/>
+                    <RemoveField index={index} remove={remove} />
                   </Box>
                 ))}
-                {/* add button */}
-                <AddField fieldName={'phones'} append={append as UseFieldArrayAppend<Contact, "phones">}/>
+                <AddField
+                  fieldName={'phones'}
+                  append={append as UseFieldArrayAppend<Contact, 'phones'>}
+                />
+                {/* --- EMAILS --- */}
+                {/* --- ADDRESSES --- */}
+                {/* --- CATEGORIES --- */}
 
-              {/* NOTES */}
-              <NotesInput maxLength={200} placeholder="Enter notes" />
+                {/* --- ORGANISATION NAME --- */}
+                {/* --- WEBSITE URL --- */}
 
-              {/* SUBMIT BTN */}
-              <Button type="submit" variant="outlined">
-                Save Contact
-              </Button>
+                {/* --- NOTES --- */}
+                <NotesInput maxLength={200} placeholder="Enter notes" />
+
+                {/* --- TAGS --- */}
+
+                {/* --- SUBMIT FORM --- */}
+                <Button type="submit" variant="outlined">
+                  Save Contact
+                </Button>
               </Stack>
             </form>
           </FormProvider>
