@@ -8,7 +8,7 @@ import { Link as RouterLink } from 'react-router';
 import { EntityId } from '@reduxjs/toolkit';
 
 import IconButton from '@mui/joy/IconButton';
-import { Card, CardContent, Typography} from '@mui/joy'; // TODO - style alert, <Alert/>
+import { Card, CardContent, Typography, Box } from '@mui/joy'; // TODO - style alert, <Alert/>
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -28,6 +28,10 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
     firstName = 'N/A',
     lastName = 'N/A',
     phones = [],
+    emails = [],
+    organisation = '',
+    webUrl = '',
+    notes = '',
   } = selectedContact || {};
 
   console.log('CONTACT CARD ', selectedContact);
@@ -54,19 +58,36 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
       }}
     >
-      <div
+      <Box
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}
-      ></div>
-      <Typography sx={{ mb: 1 }}>{`${firstName} ${lastName}`}</Typography>
+      ></Box>
+      <Typography
+        level="h4"
+        sx={{ mb: 1 }}
+      >{`${firstName} ${lastName}`}</Typography>
       <>
         {phones.map((phoneObj, index) => (
-          <div key={index}>{phoneObj.phone}</div>
+          <Box key={index}>
+            <Typography>
+            {phoneObj.phone}
+            </Typography>
+            
+            </Box>
         ))}
       </>
+      <>
+        {emails.map((emailObj, index) => (
+          <Box key={index}>{emailObj.email}</Box>
+        ))}
+      </>
+      <Box>{organisation}</Box>
+
+      <Box>{webUrl}</Box>
+      <Box>{notes}</Box>
 
       <CardContent>
         <IconButton onClick={handleDeleteCard} variant="outlined">

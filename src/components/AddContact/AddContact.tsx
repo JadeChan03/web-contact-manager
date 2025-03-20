@@ -1,10 +1,12 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import {
   useForm,
   useFieldArray,
   FormProvider,
   UseFieldArrayAppend,
 } from 'react-hook-form';
+import { Link as RouterLink } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
 import { contactAdded } from '../../redux/slices/contactsSlice';
@@ -19,17 +21,16 @@ import {
 import { AddField, RemoveField } from '../Buttons/Buttons';
 import { SingleInput } from '../SingleInput/SingleInput';
 import { PhoneInput } from '../PhoneInput/PhoneInput';
-import {
-  parsePhoneNumberFromString as parsePhoneNumber,
-  type CountryCode,
-} from 'libphonenumber-js';
+// validation helper functions
+
 import { NotesInput } from '../NotesInput/NotesInput';
-import { Card, Button, Box, IconButton, Stack } from '@mui/joy';
+// MUI/JOY IMPORTS
+import { Card, Button, Box, IconButton, Stack, Typography } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
-  const [visibility, setVisibility] = useState(false);
+  const navigate = useNavigate();
 
   /* ----- CREATE REACT HOOK FORM -----  */
   const methods = useForm<Contact>({
@@ -37,7 +38,7 @@ export const AddContact = () => {
       id: nanoid(),
       firstName: '',
       lastName: '',
-      phones: [{ id: nanoid(), phone: '', countryCode: '' } as Phone],
+      phones: [{ id: nanoid(), phone: '', countryCode: null } as Phone],
       emails: [{ id: nanoid(), email: '' } as Email],
       addresses: [{ id: nanoid(), addr1: '', addr2: '' } as Address],
       categories: [{ id: nanoid(), category: '' } as Category],
@@ -54,96 +55,146 @@ export const AddContact = () => {
   // phones
   const {
     fields: phoneFields,
-    append,
-    remove,
+    append: appendPhone,
+    remove: removePhone,
   } = useFieldArray({ control, name: 'phones' });
-  //   // emails
-  //   const {emails: emailFields, append, remove} = useFieldArray({control, name: 'emails'})
+  // emails
+  const {
+    fields: emailFields,
+    append: appendEmail,
+    remove: removeEmail,
+  } = useFieldArray({ control, name: 'emails' });
   //   // addresses
-  //   const { addresses: addressFields, append, remove} = useFieldArray({control, 'addresses'});
+  //   const { fields: addressFields, append: appendAddress, remove: removeAddress} = useFieldArray({control, 'addresses'});
   // categories
-  //   const {fields: categoryFields, append, remove} = useFieldArray({control, name: 'categories'})
+  //   const {fields: categoryFields, append: appendCategory, removeCategory} = useFieldArray({control, name: 'categories'})
   //   // tags
-  //   const {fields: tagFields, append, remove} = useFieldArray({control, name: 'tags'})
+  //   const {fields: tagFields, append: appendTag, remove: removeTag} = useFieldArray({control, name: 'tags'})
 
   const onSubmit = (data: Contact) => {
     console.log('data ', data);
-    console.log('data.phones ', data.phones);
-    console.log('data.notes ', data.notes);
 
     const newContact = {
       ...data,
-      phones: data.phones.map((phoneObj) => ({
-        ...phoneObj,
-        phone:
-          parsePhoneNumber(
-            phoneObj.phone,
-            phoneObj.countryCode as CountryCode
-          )?.format('E.164') || phoneObj.phone,
-      })),
+      
     };
     dispatch(contactAdded(newContact));
-    setVisibility(false);
     reset();
+    navigate('/');
   };
 
   return (
-    <Box
-      role={'presentation'}
-      sx={{ display: 'flex', justifyContent: 'center' }}
-    >
-      {visibility ? (
-        <Card sx={{ p: 5, width: 500 }}>
-          <IconButton onClick={() => setVisibility(false)} sx={{ ml: 'auto' }}>
-            <CloseIcon />
-          </IconButton>
-          {/* ------------------------- FORM SECTION -------------------------- */}
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Stack spacing={2}>
-                {/* --- FIRST/LAST NAME --- */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <SingleInput fieldName="firstName" placeholder="First name" />
-                  <SingleInput fieldName="lastName" placeholder="Last name" />
-                </Box>
-                {/* --- PHONES --- */}
-                {phoneFields.map((field, index) => (
-                  <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
-                    <PhoneInput index={index} />
-                    <RemoveField index={index} remove={remove} />
-                  </Box>
-                ))}
-                <AddField
-                  fieldName={'phones'}
-                  append={append as UseFieldArrayAppend<Contact, 'phones'>}
+    <Card sx={{ p: 5, width: 500 }}>
+      <IconButton
+        onClick={() => {
+          reset();
+        }}
+        variant="outlined"
+        component={RouterLink}
+        to={'/'}
+        sx={{ ml: 'auto' }}
+      >
+        <CloseIcon />
+      </IconButton>
+      {/* ------------------------- FORM SECTION -------------------------- */}
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={2}>
+            {/* --- FIRST/LAST NAME --- */}
+            <Typography level="h4">Name</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <SingleInput
+                fieldName="firstName"
+                placeholder="First name"
+                required={true}
+              />
+              <SingleInput
+                fieldName="lastName"
+                placeholder="Last name"
+                required={true}
+              />
+            </Box>
+            {/* --- PHONES --- */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography level="h4">Phone</Typography>
+              <AddField
+                fieldName={'phones'}
+                append={appendPhone as UseFieldArrayAppend<Contact, 'phones'>}
+              />
+            </Box>
+            {phoneFields.map((field, index) => (
+              <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                <PhoneInput index={index} />
+                <RemoveField
+                  index={index}
+                  remove={removePhone}
+                  disabled={index === 0 && true}
                 />
-                {/* --- EMAILS --- */}
-                {/* --- ADDRESSES --- */}
-                {/* --- CATEGORIES --- */}
+              </Box>
+            ))}
+            {/* --- EMAIL --- */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography level="h4">Email</Typography>
+              <AddField
+                fieldName={'emails'}
+                append={appendEmail as UseFieldArrayAppend<Contact, 'emails'>}
+              />
+            </Box>
 
-                {/* --- ORGANISATION NAME --- */}
-                {/* --- WEBSITE URL --- */}
+            {emailFields.map((field, index) => (
+              <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                <SingleInput
+                  fieldName={`emails.${index}.email`}
+                  placeholder="Enter email"
+                  required={false}
+                  validationType="email"
+                />
+                <RemoveField
+                  index={index}
+                  remove={removeEmail}
+                  disabled={index === 0 && true}
+                />
+              </Box>
+            ))}
 
-                {/* --- NOTES --- */}
-                <NotesInput maxLength={200} placeholder="Enter notes" />
+            {/* --- ADDRESS--- */}
+            <Typography level="h4">Address</Typography>
 
-                {/* --- TAGS --- */}
+            {/* --- CATEGORIES --- */}
+            <Typography level="h4">Categories</Typography>
 
-                {/* --- SUBMIT FORM --- */}
-                <Button type="submit" variant="outlined">
-                  Save Contact
-                </Button>
-              </Stack>
-            </form>
-          </FormProvider>
-          {/* ------------------------- END FORM SECTION ---------------------- */}
-        </Card>
-      ) : (
-        <Button onClick={() => setVisibility(true)} variant="outlined">
-          {' '}
-          Add New Contact
-        </Button>
-      )}
-    </Box>
+            {/* --- ORGANISATION NAME --- */}
+            <Typography level="h4">Organisation Name</Typography>
+            <SingleInput
+              fieldName="organisation"
+              placeholder="Enter organisation"
+              required={false}
+            />
+
+            {/* --- WEBSITE URL --- */}
+            <Typography level="h4">WebSite Url</Typography>
+            <SingleInput
+              fieldName="webUrl"
+              placeholder="Enter url"
+              required={false}
+              validationType="url"
+            />
+
+            {/* --- NOTES --- */}
+            <Typography level="h4">Notes</Typography>
+            <NotesInput maxLength={200} placeholder="Enter notes" />
+
+            {/* --- TAGS --- */}
+            <Typography level="h4">Tags</Typography>
+
+            {/* --- SUBMIT FORM --- */}
+            <Button type="submit" variant="outlined">
+              Save Contact
+            </Button>
+          </Stack>
+        </form>
+      </FormProvider>
+      {/* ------------------------- END FORM SECTION ---------------------- */}
+    </Card>
   );
 };

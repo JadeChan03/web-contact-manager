@@ -44,10 +44,11 @@ export const AddField: React.FunctionComponent<AddFieldProps> = ({
 interface RemoveFieldProps {
   index: number;
   remove: UseFieldArrayRemove;
+  disabled?: boolean;
 }
 
-export const RemoveField: React.FunctionComponent<RemoveFieldProps>  = ({index, remove}) => (
-  <IconButton onClick={() => remove(index)}>
+export const RemoveField: React.FunctionComponent<RemoveFieldProps>  = ({index, remove, disabled = false}) => (
+  <IconButton disabled={disabled}onClick={() => remove(index)} sx={{maxHeight: 20}}>
     <RemoveIcon fontSize="small" />
   </IconButton>
 );

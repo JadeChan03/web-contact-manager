@@ -2,15 +2,21 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { FormControl, FormHelperText, Input, Box } from '@mui/joy';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import { validateInput } from '../../utils/validate';
 import { type Contact } from '../../types/contactTypes';
-type SingleInputField = Extract<keyof Contact, 'firstName'| 'lastName'| 'organisation'| 'webUrl'>;
+type DynamicContactKeys =
+  | 'firstName'
+  | 'lastName'
+  | 'organisation'
+  | 'webUrl'
+  | `emails.${number}.email`;
 
 export interface SingleInputProps {
-  fieldName: SingleInputField
+  fieldName: DynamicContactKeys;
   placeholder: string;
+  required: boolean;
+  validationType?: 'email' | 'url'; // custom validation function for emails, website
   maxLength?: number;
-  required?: boolean; // required fields: firstName, lastName
-  validation?: (value: string) => boolean | string; // custom validation function for emails, website
 }
 
 export const SingleInput: React.FunctionComponent<SingleInputProps> = ({
@@ -18,48 +24,45 @@ export const SingleInput: React.FunctionComponent<SingleInputProps> = ({
   placeholder,
   maxLength = 30,
   required = false,
-  validation,
+  validationType,
 }) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<Contact>();
+  const { control } = useFormContext<Contact>();
 
   return (
-    <FormControl error={!!errors[fieldName]}>
-      <Controller
-        name={fieldName}
-        control={control}
-        rules={{
-          required: required ? 'This field is required' : false,
-          validate: validation,
-          maxLength: {
-            value: maxLength,
-            message: 'Maximum length exceed',
-          }
-        }}
-        render={({ field, fieldState }) => (
+    <Controller
+      name={fieldName}
+      control={control}
+      rules={{
+        required: required ? 'Required' : false,
+        validate: (value) =>
+          validationType ? validateInput(value, validationType) : true,
+        maxLength: {
+          value: maxLength,
+          message: 'Maximum length exceed',
+        },
+      }}
+      render={({ field, fieldState }) => (
+        <FormControl error={!!fieldState.error} sx={{width: '100%'}}>
           <Box>
             <Input
               {...field}
-			  value={field.value as string}
+              value={field.value as string}
               placeholder={placeholder}
               slotProps={{
                 input: {
                   maxLength: maxLength,
-                }
+                },
               }}
-              error={!!fieldState.error}
             />
             {fieldState.error && (
               <FormHelperText>
                 <InfoOutlined sx={{ mr: 1 }} />
-                {fieldState.error.message}
+                {fieldState.error.message}q
               </FormHelperText>
             )}
           </Box>
-        )}
-      />
-    </FormControl>
+        </FormControl>
+      )}
+    />
   );
 };

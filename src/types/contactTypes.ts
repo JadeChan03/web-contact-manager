@@ -17,7 +17,7 @@ export interface Contact {
 export interface Phone {
   id: string;
   phone: string;
-  countryCode: string;
+  countryCode: string | null;
 }
 
 export interface Email {

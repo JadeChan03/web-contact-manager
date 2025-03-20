@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import {
-  Select,
-  Option,
+  // Select,
+  // Option,
+
   Box,
   Input,
   FormControl,
   FormHelperText,
+  Autocomplete,
+  AutocompleteOption,
+  ListItemDecorator,
+  ListItemContent,
+  Typography,
 } from '@mui/joy';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
-import LanguageIcon from '@mui/icons-material/Language';
+// import LanguageIcon from '@mui/icons-material/Language';
 import {
   parsePhoneNumberFromString as parsePhoneNumber,
   // type CountryCallingCode,
@@ -28,40 +34,17 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
   index,
 }) => {
   /* --- destructure methods from AddContact form --- */
-  const { control, watch, setValue } = useFormContext<Contact>();
+  const { control, setValue } = useFormContext<Contact>();
 
   /* --- LOCAL STATES --- */
   const [countryCode, setCountryCode] = useState(''); // ie. 'US'
   const [countryDialCode, setCountryDialCode] = useState(''); // ie. '+1'
-  const [displayValue, setDisplayValue] = useState(''); // display in UIwithout country code
+  const [selectedValue, setSelectedValue] = useState<countryCodeData | null>(null); // default to local
+  const [displayValue, setDisplayValue] = useState(''); // display phone in UI without country code
 
-  /* --- WATCH REACT HOOK FORM FIELDS --- */
-  const selectedCountryCode = watch(`phones.${index}.countryCode`);
-  // const phoneValue = watch(`phones.${index}.phone`);
-
-  /* --- FETCH COUNTRY CODES DATA (with custom hook) --- */
+  // fetch country code data
   const countryCodeData: countryCodeData[] = useCountryCodeData();
-  // console.log('countryCodesData in PhoneInput ', countryCodeData);
 
-  /* --- HANDLE COUNTRY SELECTOR CHANGE --- */
-  const handleCountryChange = (
-    e: React.SyntheticEvent | null,
-    value: string | null
-  ) => {
-    // update countryCode state onChange ie. 'US'
-    // setCountryCode(value);
-    // console.log('value ', value);
-    //validate countryCode, returns countryCodeData object {name, dial_code, code}
-
-    const countryObj = countryCodeData.find((c) => c.code === value);
-    console.log('countryObj ', countryObj);
-    // if valid, update LOCAL country code and dial code state
-    if (countryObj) {
-      setCountryCode(value as string); // ie. 'US'
-      setCountryDialCode(countryObj.dial_code); // ie. '+1
-      setValue(`phones.${index}.countryCode`, value as string); // update form state country code
-    }
-  };
 
   /* --- HANDLE PHONE INPUT CHANGE --- */
   const handlePhoneChange = (
@@ -72,7 +55,6 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
 
     // remove non-digits
     displayVal = displayVal.replace(/[^\d]/g, '');
-
     // validate phone number
     const phoneNumber = parsePhoneNumber(
       displayVal,
@@ -82,74 +64,110 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
     if (phoneNumber) {
       // prevent exceeding maxLength, TODO - consider making helper function so logic is reusable
       const maxLength = phoneNumber.nationalNumber.length;
-      if (displayVal.length > countryDialCode.length + maxLength) return; // 
+      if (displayVal.length > countryDialCode.length + maxLength) return; //
 
       // set states with formatted number
       setDisplayValue(phoneNumber.nationalNumber); // update NATIONAL number to displayVal state
       setValue(`phones.${index}.phone`, phoneNumber.nationalNumber); // update NATIONAL number to FIELD state
-      
-      // note: these return the same formats
+
+      // note: phoneNumber.format('E.164') and phoneNumber.number return the same thing
       console.log('format to E.164 ', phoneNumber.format('E.164')) // chosen for readability
-      console.log('format to number ', phoneNumber.number)
+      // console.log('format to number ', phoneNumber.number)
 
       field.onChange(phoneNumber.format('E.164')); // register INTERNATIONAL number to (react hook) FORM state
     } else {
       const maxLength = 15;
-      // prevent exceeding maxLength
       if (displayVal.length > countryDialCode.length + maxLength) return;
 
       // set states with formatted number
       setDisplayValue(displayVal);
       setValue(`phones.${index}.phone`, displayVal);
+      field.onChange(displayVal);
     }
   };
 
   /* --- PHONE INPUT VALIDATION --- */
+  // TODO - future refactor, place in validate.ts so that function can be reused
+  // TODO - consider allowing users to input custom number w/o country code and validation?
   const validatePhoneNumber = (value: string) => {
-    // note: allow users to input custom number w/o country code and validation?
-
-    // validate country selection
-    if (!selectedCountryCode) return 'Country code is required';
-    // validate phone number via libphonenumber method
-    const phoneNumber = parsePhoneNumber(value, countryCode as CountryCode);
+    const phoneNumber = parsePhoneNumber(
+      value,
+      countryCode as CountryCode
+    );
     return phoneNumber?.isValid() || 'Invalid phone number';
   };
 
   return (
     <Box sx={{ minWidth: 375, display: 'flex', gap: 2 }}>
       {/* COUNTRY CODE SELECTOR */}
-      <Box>
-        <Select
-          value={countryCode}
-          // placeholder={''}
-          onChange={handleCountryChange}
-          startDecorator={<LanguageIcon />}
-          slotProps={{
-            listbox: {
-              placement: 'bottom-start',
-              sx: { maxWidth: 50 },
-            },
-          }}
-          sx={{ minWidth: 120 }}
-        >
-          {countryCodeData.map((country: countryCodeData) => (
-            <Option
-              key={country.code}
-              value={country.code}
-              label={country.dial_code}
-            >
-              {country.name} ({country.dial_code})
-            </Option>
-          ))}
-        </Select>
-      </Box>
+
+      <Controller
+        name={`phones.${index}.countryCode`}
+        control={control}
+        rules={{
+          required: 'Required',
+        }}
+        render={({ field, fieldState }) => (
+          <FormControl error={!!fieldState.error}>
+            <Autocomplete
+              {...field}
+              value={selectedValue}
+              placeholder="Country"
+              slotProps={{
+                input: {
+                  autoComplete: 'new-password', // disable autocomplete and autofill
+                },
+              }}
+              sx={{ width: 120 }}
+              options={countryCodeData}
+              // search by country code, dial code or country name
+              getOptionLabel={(option) =>
+                `${option.code} ${option.dial_code} ${option.name}`
+              }
+              onChange={(_, val) => {
+                const newVal = val as countryCodeData
+                setSelectedValue(newVal);
+               field.onChange(newVal?.code || null);
+               setCountryDialCode(newVal.dial_code);
+               setCountryCode(newVal.code);
+              }}
+              isOptionEqualToValue={(option, value) => option.code === value?.code}
+              renderOption={(props, option) => (
+                <AutocompleteOption {...props}>
+                  <ListItemDecorator>
+                    <img
+                      loading="lazy"
+                      width="20"
+                      srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                      src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                      alt=""
+                    />
+                  </ListItemDecorator>
+                  <ListItemContent sx={{ fontSize: 'sm' }}>
+                    <Typography level="body-xs">
+                      ({option.code}) {option.dial_code}
+                    </Typography>
+                  </ListItemContent>
+                </AutocompleteOption>
+              )}
+            />
+
+            {fieldState.error && (
+              <FormHelperText>
+                <InfoOutlined sx={{ mr: 1 }} />
+                {index === 0 ? fieldState.error.message : 'Remove'}
+              </FormHelperText>
+            )}
+          </FormControl>
+        )}
+      />
 
       {/* PHONE NUMBER INPUT */}
       <Controller
-        name={`phones.${index}.phone`} // expecting string "phone", receiving string "phone" but not reading properly
-        control={control} // expecting Control<Contact>, but receiving 'Control<{ id: string; phone: string; countryCode: string; }>'
+        name={`phones.${index}.phone`}
+        control={control}
         rules={{
-          required: 'Please complete the field',
+          required: 'Required',
           validate: validatePhoneNumber,
         }}
         render={({ field, fieldState }) => (
@@ -169,7 +187,7 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
             {fieldState.error && (
               <FormHelperText>
                 <InfoOutlined sx={{ mr: 1 }} />
-                {fieldState.error.message}
+                {index === 0 ? fieldState.error.message : 'Remove blank fields'}
               </FormHelperText>
             )}
           </FormControl>

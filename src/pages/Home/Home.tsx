@@ -1,13 +1,14 @@
 import { ContactList } from '../../components/ContactList/ContactList';
-import { AddContact } from '../../components/AddContact/AddContact.tsx';
-import { Grid } from '@mui/joy';
+import { Link as RouterLink } from 'react-router';
+// import { Grid } from '@mui/joy';
 // import { PageContainer } from '@toolpad/core/PageContainer';
+import { Typography, Button } from '@mui/joy';
 
 export const Home = () => {
   return (
     <>
-    <h1>Home</h1>
-      <AddContact />
+      <Typography level="h1">Home</Typography>
+      <Button variant="outlined" component={RouterLink} to={'/add-contact'}>Add Contact</Button>
       <ContactList />
     </>
   );
