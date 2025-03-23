@@ -1,4 +1,5 @@
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
+import { SearchContact } from '../SearchContact/SearchContact';
 import { ContactCard } from '../ContactCard/ContactCard';
 import {
   selectContacts,
@@ -15,7 +16,8 @@ import {
 export const ContactList = () => {
   const contacts = useAppSelector(selectContacts);
   const dispatch = useAppDispatch();
-
+  // search term state
+  const [searchTerm, setSearchTerm] = useState('');
   // selection state
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(
     new Set()
@@ -44,10 +46,27 @@ export const ContactList = () => {
   };
 
   const exportSelectedContacts = () => {
+    if (selectedContacts.size === 0) {
+      alert('No contacts selected for export.');
+      return;
+    }
     const selected = contacts.filter(({ id }) =>
       selectedContacts.has(id as string)
     );
     exportContactsToVCard(selected);
+  };
+
+  const deleteSelectedContacts = () => {
+    if (selectedContacts.size === 0) {
+      alert('No contacts selected for export.');
+      return;
+    }
+    if (window.confirm(`Delete selected contacts?`)) {
+      selectedContacts.forEach((id) => {
+        dispatch(contactDeleted(id));
+      });
+    }
+    setSelectedContacts(new Set());
   };
 
   const handleImportContacts = async (
@@ -55,63 +74,143 @@ export const ContactList = () => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const existingContacts = contacts;
 
     try {
-      const importedContacts = await importContactsFromVCard(file);
-      // implement conflict resolution logic
-      importedContacts.forEach((contact) => {
+      const { added, updated, skipped } = await importContactsFromVCard(
+        file,
+        existingContacts
+      );
+
+      // handle added contacts
+      added.forEach((contact) => {
         dispatch(contactAdded(contact));
       });
+
+      // handle updated contacts
+      // TODO - fix bug, updated contacts still renders new contact card
+      for (const contact of updated) {
+        const shouldUpdate = window.confirm(
+          `Contact ${contact.firstName} ${contact.lastName} already exists. Do you want to update it?`
+        );
+        if (shouldUpdate) {
+          dispatch(contactAdded(contact)); // update existing contact
+        }
+      }
+
+      // handle skipped contacts
+      skipped.forEach((contact) => {
+        console.warn(
+          `Skipped contact: ${contact.firstName} ${contact.lastName} - already exists.`
+        );
+      });
+
+      alert(
+        `Import complete: ${added.length} added, ${updated.length} updated, ${skipped.length} skipped.`
+      );
     } catch (error) {
       console.error('Error importing contacts: ', error);
-      // show error to user
-      alert(error);
+      alert('Error importing contacts: ' + error);
     }
   };
 
-  const deleteSelectedContacts = () => {
-    selectedContacts.forEach((id) => {
-      dispatch(contactDeleted(id));
-    });
-    setSelectedContacts(new Set());
-  };
+  // filter contacts based on search term
+  const filteredContacts = contacts.filter((contact) => {
+    const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+    const phoneNumbers = contact.phones
+      .map((phone) => phone.phone)
+      .join(', ')
+      .toLowerCase();
+    const emails = contact.emails
+      .map((email) => email.email)
+      .join(', ')
+      .toLowerCase();
+    const addresses = contact.addresses
+      .map((address) => address.address)
+      .join(', ')
+      .toLowerCase();
+    const categories = contact.categories
+      .map((category) => category.category)
+      .join(', ')
+      .toLowerCase();
+    const webUrl = contact.webUrl.toLowerCase();
+    const notes = contact.notes.toLowerCase();
+    const tags = contact.tags
+      .map((tag) => tag.tag)
+      .join(', ')
+      .toLowerCase();
+
+    return (
+      fullName.includes(searchTerm.toLowerCase()) ||
+      phoneNumbers.includes(searchTerm.toLowerCase()) ||
+      emails.includes(searchTerm.toLowerCase()) ||
+      addresses.includes(searchTerm.toLowerCase()) ||
+      categories.includes(searchTerm.toLowerCase()) ||
+      webUrl.includes(searchTerm.toLowerCase()) ||
+      notes.includes(searchTerm.toLowerCase()) ||
+      tags.includes(searchTerm.toLocaleLowerCase())
+    );
+  });
+
+  // group contacts by tags
+  const groupedContacts = filteredContacts.reduce(
+    (acc, contact) => {
+      contact.tags.forEach((tag) => {
+        if (!acc[tag.tag]) {
+          acc[tag.tag] = [];
+        }
+        acc[tag.tag].push(contact);
+      });
+      return acc;
+    },
+    {} as Record<string, typeof filteredContacts>
+  );
 
   return (
     <Box>
-      <Box display={'flex'} gap={2} alignItems={'center'}>
+      <Box>
+        {/* search bar */}
+        <SearchContact searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <Box display={'flex'} gap={2} alignItems={'center'}>
-          {/* import files */}
-          <Typography> Import contacts </Typography>
-          <input type="file" accept=".vcf" onChange={handleImportContacts} />
+          <Box display={'flex'} gap={2} alignItems={'center'}>
+            {/* import files */}
+            <Typography> Import contacts </Typography>
+            <input type="file" accept=".vcf" onChange={handleImportContacts} />
+          </Box>
+          {/* select all checkbox */}
+          <Typography> Select all</Typography>
+          <input
+            type="checkbox"
+            checked={selectedContacts.size === contacts.length}
+            onChange={handleSelectAll}
+          />
+          {/* actions */}
+          <Button variant="outlined" onClick={exportSelectedContacts}>
+            Export Selected
+          </Button>
+          <Button variant="outlined" onClick={deleteSelectedContacts}>
+            {' '}
+            Delete Selected
+          </Button>
         </Box>
-        {/* select all checkbox */}
-        <Typography> Select all</Typography>
-        <input
-          type="checkbox"
-          checked={selectedContacts.size === contacts.length}
-          onChange={handleSelectAll}
-        />
-        {/* actions */}
-        <Button variant="outlined" onClick={exportSelectedContacts}>
-          Export Selected
-        </Button>
-        <Button variant="outlined" onClick={deleteSelectedContacts}>
-          {' '}
-          Delete Selected
-        </Button>
       </Box>
 
-      {/* contact list */}
-      <Box display={'flex'} gap={2}>
-        {contacts.map(({ id }) => (
-          <ContactCard
-            id={id}
-            key={id}
-            checked={selectedContacts.has(id as string)}
-            handleSelectContact={handleSelectContact}
-          />
-        ))}
-      </Box>
+      {/* grouped contacts by tags */}
+      {Object.entries(groupedContacts).map(([tag, contactList]) => (
+        <Box key={tag} marginTop={2}>
+          <Typography level="h4">#{tag}</Typography>
+          <Box display={'flex'} gap={2}>
+            {contactList.map(({ id }) => (
+              <ContactCard
+                id={id}
+                key={id}
+                checked={selectedContacts.has(id as string)}
+                handleSelectContact={handleSelectContact}
+              />
+            ))}
+          </Box>
+        </Box>
+      ))}
     </Box>
   );
 };
