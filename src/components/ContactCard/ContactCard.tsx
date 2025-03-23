@@ -14,10 +14,14 @@ import EditIcon from '@mui/icons-material/Edit';
 
 interface ContactCardProps {
   id: EntityId;
+  checked: boolean;
+  handleSelectContact: (contactId: string) => void;
 }
 
 export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
   id,
+  checked,
+  handleSelectContact,
 }) => {
   const dispatch = useAppDispatch();
   const selectedContact = useAppSelector((state) =>
@@ -49,6 +53,8 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
     }
   };
 
+  console.log('selected contact ', selectedContact);
+
   return (
     <Card
       sx={{
@@ -79,15 +85,24 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
           to={`/contact/${id}`}
           variant="outlined"
         >
-          <EditIcon/>
+          <EditIcon />
         </IconButton>
-        <Avatar>{`${firstName[0]}${lastName[0]}`}</Avatar>
+
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => handleSelectContact(id as string)}
+        />
       </Box>
+
       {/* contact name */}
-      <Typography
-        level="h3"
-        sx={{ mb: 1 }}
-      >{`${firstName} ${lastName}`}</Typography>
+      <Box display={'flex'} alignItems={'center'} gap={1}>
+        <Avatar>{`${firstName[0]}${lastName[0]}`}</Avatar>
+        <Typography
+          level="h3"
+          sx={{ mb: 1 }}
+        >{`${firstName} ${lastName}`}</Typography>
+      </Box>
 
       {/* display phone numbers */}
       {phones.map((phoneObj, index) => (
@@ -95,40 +110,41 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
           <Typography>{phoneObj.phone}</Typography>
         </Box>
       ))}
-      {/* display addresses */}
 
+      {/* display addresses */}
       {addresses.map((addressObj, index) => (
         <Box key={index}>
           <Typography>{addressObj.address}</Typography>
         </Box>
       ))}
-      {/* display emails */}
 
+      {/* display emails */}
       {emails.map((emailObj, index) => (
         <Box key={index}>
           <Typography>{emailObj.email}</Typography>
         </Box>
       ))}
-      {/* display categories*/}
 
+      {/* display categories*/}
       {categories.map((categoryObj, index) => (
         <Box key={index}>
           <Typography>{categoryObj.category}</Typography>
         </Box>
       ))}
+
+      {/* display organisation, website, notes, tags */}
+      <Typography sx={{ mb: 1 }}>Organisation: {organisation}</Typography>
+      <Typography sx={{ mb: 1 }}>Website: {webUrl}</Typography>
+      <Typography sx={{ mb: 1 }}>Notes: {notes}</Typography>
       {/* display tags*/}
+      <Box display={'flex'} alignItems={'center'} gap={1}>
+        <Typography> Tags:</Typography>
       {tags.map((tagObj, index) => (
         <Box key={index}>
-          <Typography>{tagObj.tag}</Typography>
+          <Typography># {tagObj.tag}</Typography>
         </Box>
-      ))}
-
-      {/* display organisation, website, notes */}
-      <Box>
-        <Typography sx={{ mb: 1 }}>Organisation: {organisation}</Typography>
-        <Typography sx={{ mb: 1 }}>Website: {webUrl}</Typography>
-        <Typography sx={{ mb: 1 }}>Notes: {notes}</Typography>
-      </Box>
+        ))}
+        </Box>
     </Card>
   );
 };
