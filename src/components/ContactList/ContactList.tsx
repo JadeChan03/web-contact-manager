@@ -1,33 +1,117 @@
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { ContactCard } from '../ContactCard/ContactCard';
-import { selectContacts } from '../../redux/slices/contactsSlice';
-// import { Contact } from '../../types/contactTypes';
-import { Stack } from '@mui/joy';
+import {
+  selectContacts,
+  contactDeleted,
+  contactAdded,
+} from '../../redux/slices/contactsSlice';
+import { Box, Typography, Button } from '@mui/joy';
+import { useState } from 'react';
+import {
+  exportContactsToVCard,
+  importContactsFromVCard,
+} from '../../utils/vcard';
 
 export const ContactList = () => {
-  // select all contacts with memoized selectors, which returns an array of objects
   const contacts = useAppSelector(selectContacts);
-  console.log('RENDERING CONTACT LIST HERE ', contacts);
+  const dispatch = useAppDispatch();
 
-  const renderedContacts = contacts.map(({ id }) => (
-    <ContactCard id={id} key={id} />
-  ));
+  // selection state
+  const [selectedContacts, setSelectedContacts] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleSelectContact = (id: string) => {
+    setSelectedContacts((prev) => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(id)) {
+        newSelection.delete(id); // deselect
+      } else {
+        newSelection.add(id); // select
+      }
+      return newSelection;
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectedContacts((prev) => {
+      if (prev.size === contacts.length) {
+        return new Set(); // deselect all
+      } else {
+        return new Set(contacts.map(({ id }) => id as string)); // select all
+      }
+    });
+  };
+
+  const exportSelectedContacts = () => {
+    const selected = contacts.filter(({ id }) =>
+      selectedContacts.has(id as string)
+    );
+    exportContactsToVCard(selected);
+  };
+
+  const handleImportContacts = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const importedContacts = await importContactsFromVCard(file);
+      // implement conflict resolution logic
+      importedContacts.forEach((contact) => {
+        dispatch(contactAdded(contact));
+      });
+    } catch (error) {
+      console.error('Error importing contacts: ', error);
+      // show error to user
+      alert(error);
+    }
+  };
+
+  const deleteSelectedContacts = () => {
+    selectedContacts.forEach((id) => {
+      dispatch(contactDeleted(id));
+    });
+    setSelectedContacts(new Set());
+  };
 
   return (
-    <div className="contactList-container">
-      <h2>Contact List:</h2>
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        {renderedContacts.length < 1
-          ? `u have no contacts...`
-          : renderedContacts}
-      </Stack>
-    </div>
+    <Box>
+      <Box display={'flex'} gap={2} alignItems={'center'}>
+        <Box display={'flex'} gap={2} alignItems={'center'}>
+          {/* import files */}
+          <Typography> Import contacts </Typography>
+          <input type="file" accept=".vcf" onChange={handleImportContacts} />
+        </Box>
+        {/* select all checkbox */}
+        <Typography> Select all</Typography>
+        <input
+          type="checkbox"
+          checked={selectedContacts.size === contacts.length}
+          onChange={handleSelectAll}
+        />
+        {/* actions */}
+        <Button variant="outlined" onClick={exportSelectedContacts}>
+          Export Selected
+        </Button>
+        <Button variant="outlined" onClick={deleteSelectedContacts}>
+          {' '}
+          Delete Selected
+        </Button>
+      </Box>
+
+      {/* contact list */}
+      <Box display={'flex'} gap={2}>
+        {contacts.map(({ id }) => (
+          <ContactCard
+            id={id}
+            key={id}
+            checked={selectedContacts.has(id as string)}
+            handleSelectContact={handleSelectContact}
+          />
+        ))}
+      </Box>
+    </Box>
   );
 };

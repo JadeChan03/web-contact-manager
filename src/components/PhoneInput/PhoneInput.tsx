@@ -55,7 +55,6 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.replace(/[^\d]/g, '');
-    setDisplayValue(inputValue);
 
     // current bug: autofill does not update phone format to E.164 in form field
     if (!selectedCountryCode) alert('Please select country code');
@@ -64,10 +63,13 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
       inputValue,
       selectedCountryCode as CountryCode
     );
-    if (phoneNumber && phoneNumber.isValid()) {
-      setValue(`phones.${index}.phone`, phoneNumber.format('E.164'));
-    } else {
-      setValue(`phones.${index}.phone`, inputValue);
+    if (selectedCountryCode) {
+      if (phoneNumber && phoneNumber.isValid()) {
+        setDisplayValue(inputValue);
+        setValue(`phones.${index}.phone`, phoneNumber.format('E.164'));
+      } else {
+        setValue(`phones.${index}.phone`, inputValue);
+      }
     }
   };
 
