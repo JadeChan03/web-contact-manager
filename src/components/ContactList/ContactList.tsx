@@ -1,20 +1,33 @@
-import { useAppSelector } from '../../app/hooks';
-// import ContactCard from '../ContactCard/ContactCard';
+import { useAppSelector } from '../../redux/hooks';
+import { ContactCard } from '../ContactCard/ContactCard';
+import { selectContacts } from '../../redux/slices/contactsSlice';
+// import { Contact } from '../../types/contactTypes';
+import { Stack } from '@mui/joy';
 
 export const ContactList = () => {
- // Select the `state.contactList` value from the store into the component
- const contactList = useAppSelector(state => state.contactList)
+  // select all contacts with memoized selectors, which returns an array of objects
+  const contacts = useAppSelector(selectContacts);
+  console.log('RENDERING CONTACT LIST HERE ', contacts);
 
-  const renderedContactList = contactList.map(contactCard => (
-    <div className="contact-card" key={contactCard.id}>
-      <h3>{contactCard.firstName} {contactCard.lastName}</h3>
-    </div>
-  ))
-	
+  const renderedContacts = contacts.map(({ id }) => (
+    <ContactCard id={id} key={id} />
+  ));
+
   return (
-    <section className="contact-list">
-    <h2>contact list:</h2>
-    {renderedContactList}
-  </section>
+    <div className="contactList-container">
+      <h2>Contact List:</h2>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {renderedContacts.length < 1
+          ? `u have no contacts...`
+          : renderedContacts}
+      </Stack>
+    </div>
   );
-}
+};

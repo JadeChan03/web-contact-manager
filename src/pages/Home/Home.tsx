@@ -1,13 +1,17 @@
 import { ContactList } from '../../components/ContactList/ContactList';
-import { AddContact } from '../../components/AddContact/AddContact';
-function Home() {
-	return (
-		<>
-		<h1>people</h1>
-		<AddContact/>
-		<ContactList/>
-		</>
-	)
-}
+import { Link } from 'react-router';
+import { Typography, Button } from '@mui/joy';
 
-export default Home
+export const Home = () => {
+  return (
+    <>
+      <Typography level="h1">Home</Typography>
+      <Button variant="outlined" component={Link} to={'/contact'}>
+        Add Contact
+      </Button>
+      <ContactList />
+    </>
+  );
+};
+
+
