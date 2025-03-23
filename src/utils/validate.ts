@@ -1,6 +1,7 @@
 /* --- VALIDATION HELPER FUNCTIONS --- */
-// created with the intention to pass thru controller components
 
+
+// validate email and website url
 type ValidationType = 'email' | 'url';
 
 export const validateInput = (
@@ -25,6 +26,13 @@ export const validateInput = (
       return 'Invalid validation type';
   }
 };
-// regex source:
 
-/* email */
+// format phone numbers to E.164 
+import { CountryCode, parsePhoneNumberFromString as parsePhoneNumber } from 'libphonenumber-js';
+
+export const formatToE164 = (input: string, countryCode: CountryCode) => {
+	const phoneNumber = parsePhoneNumber(input, countryCode); // expected data shape: {country: 'Hong Kong', dial_code: '+852', code: 'HK'}
+	return phoneNumber?.format('E.164') || input;
+}
+
+

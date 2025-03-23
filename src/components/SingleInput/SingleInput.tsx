@@ -9,7 +9,10 @@ type DynamicContactKeys =
   | 'lastName'
   | 'organisation'
   | 'webUrl'
-  | `emails.${number}.email`;
+  | `emails.${number}.email`
+  | `addresses.${number}.address`
+  | `categories.${number}.category`
+  | `tags.${number}.tag`;
 
 export interface SingleInputProps {
   fieldName: DynamicContactKeys;
@@ -42,7 +45,7 @@ export const SingleInput: React.FunctionComponent<SingleInputProps> = ({
         },
       }}
       render={({ field, fieldState }) => (
-        <FormControl error={!!fieldState.error} sx={{width: '100%'}}>
+        <FormControl error={!!fieldState.error} sx={{ width: '100%' }}>
           <Box>
             <Input
               {...field}
@@ -51,13 +54,18 @@ export const SingleInput: React.FunctionComponent<SingleInputProps> = ({
               slotProps={{
                 input: {
                   maxLength: maxLength,
+                  onKeyDown: (e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                    }
+                  },
                 },
               }}
             />
             {fieldState.error && (
               <FormHelperText>
                 <InfoOutlined sx={{ mr: 1 }} />
-                {fieldState.error.message}q
+                {fieldState.error.message}
               </FormHelperText>
             )}
           </Box>

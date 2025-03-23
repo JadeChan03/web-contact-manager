@@ -8,42 +8,43 @@ import { Link as RouterLink } from 'react-router';
 import { EntityId } from '@reduxjs/toolkit';
 
 import IconButton from '@mui/joy/IconButton';
-import { Card, CardContent, Typography, Box } from '@mui/joy'; // TODO - style alert, <Alert/>
+import { Card, Typography, Box, Avatar } from '@mui/joy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
+interface ContactCardProps {
+  id: EntityId;
+}
+
+export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
   id,
 }) => {
-  // get 'dispatch' method from the store
   const dispatch = useAppDispatch();
-  // const navigate = useNavigate();
-
-  console.log('id ', id);
-  // select current contact from Redux state with id
-  const selectedContact = useAppSelector((contactsState) =>
-    selectContactById(contactsState, id)
+  const selectedContact = useAppSelector((state) =>
+    selectContactById(state, id)
   ) as Contact;
-  const {
-    firstName = 'N/A',
-    lastName = 'N/A',
-    phones = [],
-    emails = [],
-    organisation = '',
-    webUrl = '',
-    notes = '',
-  } = selectedContact || {};
 
-  console.log('CONTACT CARD ', selectedContact);
+  if (!selectedContact) {
+    return <Typography>Contact not found.</Typography>;
+  }
+
+  const {
+    firstName,
+    lastName,
+    phones,
+    emails,
+    addresses,
+    organisation,
+    categories,
+    webUrl,
+    notes,
+    tags,
+  } = selectedContact;
 
   const handleDeleteCard = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // prevent link navigation
     e.preventDefault();
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${firstName} ${lastName}?`
-      )
-    ) {
+    if (window.confirm(`Delete contact ${firstName} ${lastName}?`)) {
       dispatch(contactDeleted(id));
     }
   };
@@ -52,44 +53,24 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
     <Card
       sx={{
         p: 3,
-        width: 200,
+        width: 400,
+        // height: 400,
         position: 'relative',
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
       }}
     >
+      {/* action buttons */}
       <Box
-        style={{
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          flexDirection: 'column',
+          gap: 1,
         }}
-      ></Box>
-      <Typography
-        level="h4"
-        sx={{ mb: 1 }}
-      >{`${firstName} ${lastName}`}</Typography>
-      <>
-        {phones.map((phoneObj, index) => (
-          <Box key={index}>
-            <Typography>
-            {phoneObj.phone}
-            </Typography>
-            
-            </Box>
-        ))}
-      </>
-      <>
-        {emails.map((emailObj, index) => (
-          <Box key={index}>{emailObj.email}</Box>
-        ))}
-      </>
-      <Box>{organisation}</Box>
-
-      <Box>{webUrl}</Box>
-      <Box>{notes}</Box>
-
-      <CardContent>
+      >
         <IconButton onClick={handleDeleteCard} variant="outlined">
           <DeleteIcon />
         </IconButton>
@@ -98,9 +79,56 @@ export const ContactCard: React.FunctionComponent<{ id: EntityId }> = ({
           to={`/contact/${id}`}
           variant="outlined"
         >
-          <EditIcon />
+          <EditIcon/>
         </IconButton>
-      </CardContent>
+        <Avatar>{`${firstName[0]}${lastName[0]}`}</Avatar>
+      </Box>
+      {/* contact name */}
+      <Typography
+        level="h3"
+        sx={{ mb: 1 }}
+      >{`${firstName} ${lastName}`}</Typography>
+
+      {/* display phone numbers */}
+      {phones.map((phoneObj, index) => (
+        <Box key={index}>
+          <Typography>{phoneObj.phone}</Typography>
+        </Box>
+      ))}
+      {/* display addresses */}
+
+      {addresses.map((addressObj, index) => (
+        <Box key={index}>
+          <Typography>{addressObj.address}</Typography>
+        </Box>
+      ))}
+      {/* display emails */}
+
+      {emails.map((emailObj, index) => (
+        <Box key={index}>
+          <Typography>{emailObj.email}</Typography>
+        </Box>
+      ))}
+      {/* display categories*/}
+
+      {categories.map((categoryObj, index) => (
+        <Box key={index}>
+          <Typography>{categoryObj.category}</Typography>
+        </Box>
+      ))}
+      {/* display tags*/}
+      {tags.map((tagObj, index) => (
+        <Box key={index}>
+          <Typography>{tagObj.tag}</Typography>
+        </Box>
+      ))}
+
+      {/* display organisation, website, notes */}
+      <Box>
+        <Typography sx={{ mb: 1 }}>Organisation: {organisation}</Typography>
+        <Typography sx={{ mb: 1 }}>Website: {webUrl}</Typography>
+        <Typography sx={{ mb: 1 }}>Notes: {notes}</Typography>
+      </Box>
     </Card>
   );
 };

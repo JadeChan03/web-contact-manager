@@ -25,15 +25,15 @@ export interface Email {
   email: string;
 }
 
-// TODO: implement more international-friendly format, currently based on US standard addreses
+// TODO: implement multi input address component
 export interface Address {
   id: string;
-    addr1: string;
-    addr2?: string;
-    addr3?: string;
-    city: string;
-    state?: string;
-    zip?: string;
+    address: string; // street 1
+    // addr2?: string; // street/line 2
+    // city: string;
+    // country: string;
+    // state?: string;
+    // zip?: string;
 }
 
 export interface Category {

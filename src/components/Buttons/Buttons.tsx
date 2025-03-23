@@ -2,8 +2,15 @@ import { IconButton } from '@mui/joy';
 // import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { nanoid } from 'nanoid';
-import { type Contact, Phone } from '../../types/contactTypes';
+// import { nanoid } from 'nanoid';
+import {
+  type Contact,
+  Phone,
+  Email,
+  Address,
+  Category,
+  Tag,
+} from '../../types/contactTypes';
 type ContactField = keyof Contact;
 // type ContactInput = Contact[ContactField];
 
@@ -12,29 +19,25 @@ import React from 'react';
 
 interface AddFieldProps {
   index?: number;
-  fieldName: ContactField;
+  fieldName?: ContactField;
   append: UseFieldArrayAppend<
     Contact,
     'phones' | 'emails' | 'addresses' | 'categories' | 'tags'
   >;
+  dataShape: Phone | Email | Address | Category | Tag | (Phone | Email | Address | Category | Tag)[]
+  disabled?: boolean;
 }
 
 export const AddField: React.FunctionComponent<AddFieldProps> = ({
-  fieldName,
   append,
+  dataShape,
+  disabled = false,
 }) => {
-  // helper function
 
-  const getDataShape = () => {
-    switch (fieldName) {
-      case 'phones':
-        return { id: nanoid(), phone: '', countryCode: '' } as Phone;
-    }
-  };
 
   return (
     <>
-      <IconButton onClick={() => append(getDataShape())}>
+      <IconButton onClick={() => append(dataShape)} disabled={disabled}>
         <AddIcon fontSize="small"></AddIcon>
       </IconButton>
     </>
@@ -47,8 +50,16 @@ interface RemoveFieldProps {
   disabled?: boolean;
 }
 
-export const RemoveField: React.FunctionComponent<RemoveFieldProps>  = ({index, remove, disabled = false}) => (
-  <IconButton disabled={disabled}onClick={() => remove(index)} sx={{maxHeight: 20}}>
+export const RemoveField: React.FunctionComponent<RemoveFieldProps> = ({
+  index,
+  remove,
+  disabled = false,
+}) => (
+  <IconButton
+    disabled={disabled}
+    onClick={() => remove(index)}
+    sx={{ maxHeight: 20 }}
+  >
     <RemoveIcon fontSize="small" />
   </IconButton>
 );

@@ -1,11 +1,6 @@
 // import { useState } from 'react';
-import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-  UseFieldArrayAppend,
-} from 'react-hook-form';
-import { Link as RouterLink } from 'react-router';
+import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
+// import { Link  } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
@@ -21,16 +16,25 @@ import {
 import { AddField, RemoveField } from '../Buttons/Buttons';
 import { SingleInput } from '../SingleInput/SingleInput';
 import { PhoneInput } from '../PhoneInput/PhoneInput';
-// validation helper functions
-
 import { NotesInput } from '../NotesInput/NotesInput';
 // MUI/JOY IMPORTS
-import { Card, Button, Box, IconButton, Stack, Typography } from '@mui/joy';
+import {
+  Card,
+  Button,
+  Box,
+  IconButton,
+  Stack,
+  Typography,
+  // Input,
+  // Chip,
+} from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
+// import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  // states for disabling add/remove field buttonss
 
   /* ----- CREATE REACT HOOK FORM -----  */
   const methods = useForm<Contact>({
@@ -40,7 +44,7 @@ export const AddContact = () => {
       lastName: '',
       phones: [{ id: nanoid(), phone: '', countryCode: null } as Phone],
       emails: [{ id: nanoid(), email: '' } as Email],
-      addresses: [{ id: nanoid(), addr1: '', addr2: '' } as Address],
+      addresses: [{ id: nanoid(), address: '' } as Address],
       categories: [{ id: nanoid(), category: '' } as Category],
       organisation: '',
       webUrl: '',
@@ -51,7 +55,6 @@ export const AddContact = () => {
 
   const { control, handleSubmit, reset } = methods;
 
-  /* FIELD ARRAYS FOR DYNAMIC INPUTS */
   // phones
   const {
     fields: phoneFields,
@@ -64,20 +67,32 @@ export const AddContact = () => {
     append: appendEmail,
     remove: removeEmail,
   } = useFieldArray({ control, name: 'emails' });
-  //   // addresses
-  //   const { fields: addressFields, append: appendAddress, remove: removeAddress} = useFieldArray({control, 'addresses'});
+  // addresses
+  const {
+    fields: addressFields,
+    append: appendAddress,
+    remove: removeAddress,
+  } = useFieldArray({ control, name: 'addresses' });
   // categories
-  //   const {fields: categoryFields, append: appendCategory, removeCategory} = useFieldArray({control, name: 'categories'})
-  //   // tags
-  //   const {fields: tagFields, append: appendTag, remove: removeTag} = useFieldArray({control, name: 'tags'})
+  const {
+    fields: categoryFields,
+    append: appendCategory,
+    remove: removeCategory,
+  } = useFieldArray({ control, name: 'categories' });
+  // tags
+  const {
+    fields: tagFields,
+    append: appendTag,
+    remove: removeTag,
+  } = useFieldArray({ control, name: 'tags' });
 
   const onSubmit = (data: Contact) => {
     console.log('data ', data);
 
     const newContact = {
       ...data,
-      
     };
+    
     dispatch(contactAdded(newContact));
     reset();
     navigate('/');
@@ -88,10 +103,9 @@ export const AddContact = () => {
       <IconButton
         onClick={() => {
           reset();
+          navigate('/');
         }}
         variant="outlined"
-        component={RouterLink}
-        to={'/'}
         sx={{ ml: 'auto' }}
       >
         <CloseIcon />
@@ -119,7 +133,11 @@ export const AddContact = () => {
               <Typography level="h4">Phone</Typography>
               <AddField
                 fieldName={'phones'}
-                append={appendPhone as UseFieldArrayAppend<Contact, 'phones'>}
+                append={appendPhone}
+                dataShape={
+                  { id: nanoid(), phone: '', countryCode: '' } as Phone
+                }
+                // disabled={phoneFields[0].phone.length === 0 && true}
               />
             </Box>
             {phoneFields.map((field, index) => (
@@ -137,7 +155,8 @@ export const AddContact = () => {
               <Typography level="h4">Email</Typography>
               <AddField
                 fieldName={'emails'}
-                append={appendEmail as UseFieldArrayAppend<Contact, 'emails'>}
+                append={appendEmail}
+                dataShape={{ id: nanoid(), email: '' } as Email}
               />
             </Box>
 
@@ -158,10 +177,52 @@ export const AddContact = () => {
             ))}
 
             {/* --- ADDRESS--- */}
-            <Typography level="h4">Address</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography level="h4">Address</Typography>
+              <AddField
+                fieldName={'addresses'}
+                append={appendAddress}
+                dataShape={{ id: nanoid(), address: '' } as Address}
+              />
+            </Box>
+            {addressFields.map((field, index) => (
+              <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                <SingleInput
+                  fieldName={`addresses.${index}.address`}
+                  placeholder="Enter address"
+                  required={false}
+                />
+                <RemoveField
+                  index={index}
+                  remove={removeAddress}
+                  disabled={index === 0 && true}
+                />
+              </Box>
+            ))}
 
             {/* --- CATEGORIES --- */}
-            <Typography level="h4">Categories</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography level="h4">Categories</Typography>
+              <AddField
+                fieldName={'categories'}
+                append={appendCategory}
+                dataShape={{ id: nanoid(), category: '' } as Category}
+              />
+            </Box>
+            {categoryFields.map((field, index) => (
+              <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                <SingleInput
+                  fieldName={`categories.${index}.category`}
+                  placeholder="Enter a new category"
+                  required={false}
+                />
+                <RemoveField
+                  index={index}
+                  remove={removeCategory}
+                  disabled={index === 0 && true}
+                />
+              </Box>
+            ))}
 
             {/* --- ORGANISATION NAME --- */}
             <Typography level="h4">Organisation Name</Typography>
@@ -185,7 +246,28 @@ export const AddContact = () => {
             <NotesInput maxLength={200} placeholder="Enter notes" />
 
             {/* --- TAGS --- */}
-            <Typography level="h4">Tags</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography level="h4">Tags</Typography>
+              <AddField
+                fieldName={'tags'}
+                append={appendTag}
+                dataShape={{ id: nanoid(), category: '' } as Category}
+              />
+            </Box>
+            {tagFields.map((field, index) => (
+              <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                <SingleInput
+                  fieldName={`tags.${index}.tag`}
+                  placeholder="Enter a new category"
+                  required={false}
+                />
+                <RemoveField
+                  index={index}
+                  remove={removeTag}
+                  disabled={index === 0 && true}
+                />
+              </Box>
+            ))}
 
             {/* --- SUBMIT FORM --- */}
             <Button type="submit" variant="outlined">
