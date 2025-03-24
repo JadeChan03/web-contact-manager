@@ -145,8 +145,8 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
               placeholder="Enter phone number"
               onChange={(e) => handlePhoneChange(e)}
               error={
-                !!fieldState.error
-              } /** same as fieldState.error ? true : false **/
+                !!fieldState.error /* same as fieldState.error ? true : false */
+              } 
               sx={{ minWidth: 240 }}
             />
             {fieldState.error && (

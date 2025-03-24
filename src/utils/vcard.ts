@@ -53,7 +53,7 @@ export const exportContactsToVCard = (contacts: Contact[]) => {
       // tags
       if (contact.tags.length > 0) {
         vcard.setProperty(
-          'X-TAGS', // TS expecting 'Element'
+          'X-TAGS', // TS expecting 'Element', TODO - fix
           'X-TAGS',
           contact.tags.map((t) => t.tag).join(',')
         );
@@ -70,16 +70,59 @@ export const exportContactsToVCard = (contacts: Contact[]) => {
   link.click();
 };
 
-export const importContactsFromVCard = (file: File): Promise<Contact[]> => {
+export const importContactsFromVCard = (
+  file: File,
+  existingContacts: Contact[]
+): Promise<{ added: Contact[]; updated: Contact[]; skipped: Contact[] }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const vcardData = e.target?.result as string;
-        console.log('vcardData ', vcardData);
-        const contacts = parseVCard(vcardData); // implement this function
-        console.log('contacts parsed ', contacts);
-        resolve(contacts);
+        const importedContacts = parseVCard(vcardData);
+        // console.log('contacts parsed ', contacts);
+
+        const addedContacts: Contact[] = [];
+        const updatedContacts: Contact[] = [];
+        const skippedContacts: Contact[] = [];
+
+        // create a Set for existing contact identifiers (normalised)
+        const existingIdentifiers = new Set<string>();
+        existingContacts.forEach((contact) => {
+          contact.emails.forEach((email) =>
+            existingIdentifiers.add(email.email.toLowerCase())
+          );
+          contact.phones.forEach((phone) =>
+            existingIdentifiers.add(phone.phone)
+          );
+        });
+
+		// console.log('Existing identifiers:', Array.from(existingIdentifiers));
+
+        importedContacts.forEach((importedContact) => {
+          const identifiers = [
+            ...importedContact.emails.map((email) => email.email.toLowerCase().trim()),
+            ...importedContact.phones.map((phone) => phone.phone.trim()),
+          ];
+
+          const isDuplicate = identifiers.some((identifier) =>
+            existingIdentifiers.has(identifier)
+          );
+
+          if (isDuplicate) {
+            // if a duplicate is found, categorize it as an update
+            updatedContacts.push(importedContact);
+          } else {
+            // if no duplicate, categorize it as a new addition
+            addedContacts.push(importedContact);
+          }
+        });
+        // resolve with cateogrised contacts
+        resolve({
+          added: addedContacts,
+          updated: updatedContacts,
+          skipped: skippedContacts,
+        });
       } catch (error) {
         reject(error);
       }
@@ -179,7 +222,7 @@ export const parseVCard = (vcardData: string): Contact[] => {
       }
     });
 
-    // Only add the contact if there's meaningful information
+    // only add the contact if there's meaningful information
     if (contact.firstName || contact.lastName || contact.phones.length > 0) {
       contacts.push(contact);
     }
@@ -187,4 +230,3 @@ export const parseVCard = (vcardData: string): Contact[] => {
     return contacts;
   }, []);
 };
-

@@ -1,6 +1,4 @@
-// import { useState } from 'react';
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
-// import { Link  } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
@@ -25,11 +23,8 @@ import {
   IconButton,
   Stack,
   Typography,
-  // Input,
-  // Chip,
 } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
-// import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();
@@ -89,10 +84,11 @@ export const AddContact = () => {
   const onSubmit = (data: Contact) => {
     console.log('data ', data);
 
+    // TODO - implement filtering of blank inputs
+
     const newContact = {
       ...data,
     };
-    
     dispatch(contactAdded(newContact));
     reset();
     navigate('/');
@@ -137,7 +133,6 @@ export const AddContact = () => {
                 dataShape={
                   { id: nanoid(), phone: '', countryCode: '' } as Phone
                 }
-                // disabled={phoneFields[0].phone.length === 0 && true}
               />
             </Box>
             {phoneFields.map((field, index) => (
@@ -146,7 +141,7 @@ export const AddContact = () => {
                 <RemoveField
                   index={index}
                   remove={removePhone}
-                  disabled={index === 0 && true}
+                  disabled={index === 0}
                 />
               </Box>
             ))}
@@ -171,7 +166,7 @@ export const AddContact = () => {
                 <RemoveField
                   index={index}
                   remove={removeEmail}
-                  disabled={index === 0 && true}
+                  disabled={index === 0}
                 />
               </Box>
             ))}
@@ -195,7 +190,7 @@ export const AddContact = () => {
                 <RemoveField
                   index={index}
                   remove={removeAddress}
-                  disabled={index === 0 && true}
+                  disabled={index === 0}
                 />
               </Box>
             ))}
@@ -219,7 +214,7 @@ export const AddContact = () => {
                 <RemoveField
                   index={index}
                   remove={removeCategory}
-                  disabled={index === 0 && true}
+                  disabled={index === 0}
                 />
               </Box>
             ))}
@@ -251,7 +246,7 @@ export const AddContact = () => {
               <AddField
                 fieldName={'tags'}
                 append={appendTag}
-                dataShape={{ id: nanoid(), category: '' } as Category}
+                dataShape={{ id: nanoid(), tag: '' } as Tag}
               />
             </Box>
             {tagFields.map((field, index) => (
@@ -264,7 +259,7 @@ export const AddContact = () => {
                 <RemoveField
                   index={index}
                   remove={removeTag}
-                  disabled={index === 0 && true}
+                  disabled={index === 0}
                 />
               </Box>
             ))}

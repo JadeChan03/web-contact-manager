@@ -60,7 +60,6 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       sx={{
         p: 3,
         width: 400,
-        // height: 400,
         position: 'relative',
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -77,9 +76,17 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
           gap: 1,
         }}
       >
+        {/* select */}
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => handleSelectContact(id as string)}
+        />
+        {/* delete */}
         <IconButton onClick={handleDeleteCard} variant="outlined">
           <DeleteIcon />
         </IconButton>
+        {/* edit */}
         <IconButton
           component={RouterLink}
           to={`/contact/${id}`}
@@ -87,12 +94,6 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
         >
           <EditIcon />
         </IconButton>
-
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={() => handleSelectContact(id as string)}
-        />
       </Box>
 
       {/* contact name */}
@@ -107,28 +108,34 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       {/* display phone numbers */}
       {phones.map((phoneObj, index) => (
         <Box key={index}>
-          <Typography>{phoneObj.phone}</Typography>
+          <Typography>
+            Phone: {phoneObj.phone}
+          </Typography>
         </Box>
       ))}
 
       {/* display addresses */}
       {addresses.map((addressObj, index) => (
         <Box key={index}>
-          <Typography>{addressObj.address}</Typography>
+          <Typography>
+            Address: {addressObj.address}
+          </Typography>
         </Box>
       ))}
 
       {/* display emails */}
       {emails.map((emailObj, index) => (
         <Box key={index}>
-          <Typography>{emailObj.email}</Typography>
+          <Typography>
+            Email: {emailObj.email}
+          </Typography>
         </Box>
       ))}
 
-      {/* display categories*/}
+      {/* display categories */}
       {categories.map((categoryObj, index) => (
         <Box key={index}>
-          <Typography>{categoryObj.category}</Typography>
+          <Typography>Categories: {categoryObj.category}</Typography>
         </Box>
       ))}
 
@@ -139,12 +146,12 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       {/* display tags*/}
       <Box display={'flex'} alignItems={'center'} gap={1}>
         <Typography> Tags:</Typography>
-      {tags.map((tagObj, index) => (
-        <Box key={index}>
-          <Typography># {tagObj.tag}</Typography>
-        </Box>
+        {tags.map((tagObj, index) => (
+          <Box key={index}>
+            <Typography># {tagObj.tag}</Typography>
+          </Box>
         ))}
-        </Box>
+      </Box>
     </Card>
   );
 };

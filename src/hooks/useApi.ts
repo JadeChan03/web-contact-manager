@@ -26,6 +26,4 @@ export const useCountryCodeData = () => {
 
 
 
-// TODO - getContacts -> render with pagination logic?
-
 // TODO - postContacts

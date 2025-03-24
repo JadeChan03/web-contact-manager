@@ -2,7 +2,9 @@
 
 ## Description
 
-Web Contact Manager is a web-based application that allows users to efficiently manage their contacts. Users can add, edit, delete, and import/export contacts in vCard format. The application features a clean and user-friendly interface built with React and Material-UI, leveraging Redux for state management.
+
+Web Contact Manager is a front-end solution to a web-based application that allows users to efficiently manage their contacts. Users can add, edit, delete, and import/export contacts in vCard format. The application features a clean and user-friendly interface built with React and Material-UI, leveraging Redux for state management.
+
 
 ## Features
 
@@ -13,8 +15,7 @@ Web Contact Manager is a web-based application that allows users to efficiently 
 - Responsive design with Joy-UI by Material-UI
 
 ## Technologies Used
-
-- React
+- React + React Routers + React Hook Form
 - Redux (for state management) + RTK
 - TypeScript
 - Vite (for build and development)
@@ -43,6 +44,11 @@ Follow these steps to get the application running locally:
    ```
 
 Your app should be running on [http://localhost:5173/].
+
+## Routes
+'/' -- Home.tsx
+'/contact' -- AddContact.tsx
+'/contact/:id' -- EditContact.tsx
 
 ## Type Definitions
 
@@ -85,8 +91,16 @@ In src/redux/types.ts, types are defined for the Redux store, dispatch, and the 
 - Searching Contacts: Use the search bar to filter contacts by any of the form fields, such as name, email, phone number, etc.
 
 ## Known Issues
-
+### Implement Contact Modal
+- in the interest of time ContactModal has **not** been implemented, as such this criteria is not fully met:
+"The UI must display Contacts as cards, and once opened The UI should display a Form to Visualize, Edit or Delete the Contact." However, ContactCards are directly visualed on ContactList and have the ability to be deleted, edited, or selected. 
+### VCard/Import/Export Functionality 
 - vCard Import Duplicate Bug: The logic to check for duplicates is implemented, but the UI still renders duplicate cards in importContactsFromVCard in vcard.ts.
 - Manual Addition Duplicates: The app renders duplicate contact cards when new contacts are manually added.
+### UI
+- Handling and visualisation of undefined tags not implemented
 - Phone Number Input: The AddContact form requires users to input a country code before allowing them to enter a phone number. This should be improved in future updates to enhance user flow.
 - Overall UI Refactoring: The styling is still being refactored to improve UI intuitiveness and overall UX.
+- Loading styles have not been implemented
+### TypeScript Error
+- Unresolved type error in 'tags' section in exportContactsToVCard utility function on vcard.ts
