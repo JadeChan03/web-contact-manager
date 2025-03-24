@@ -2,7 +2,9 @@
 
 ## Description
 
+
 Web Contact Manager is a front-end solution to a web-based application that allows users to efficiently manage their contacts. Users can add, edit, delete, and import/export contacts in vCard format. The application features a clean and user-friendly interface built with React and Material-UI, leveraging Redux for state management.
+
 
 ## Features
 
@@ -13,8 +15,7 @@ Web Contact Manager is a front-end solution to a web-based application that allo
 - Responsive design with Joy-UI by Material-UI
 
 ## Technologies Used
-
-- React (React )
+- React + React Routers + React Hook Form
 - Redux (for state management) + RTK
 - TypeScript
 - Vite (for build and development)
@@ -43,6 +44,11 @@ Follow these steps to get the application running locally:
    ```
 
 Your app should be running on [http://localhost:5173/].
+
+## Routes
+'/' -- Home.tsx
+'/contact' -- AddContact.tsx
+'/contact/:id' -- EditContact.tsx
 
 ## Type Definitions
 
