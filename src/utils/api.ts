@@ -18,6 +18,8 @@ export const get = async (url: string) => {
 	}
 }
 
+// not currently in use:
+
 /* POST request */
 
 // export const post = async (url: string, reqData) => {

@@ -23,11 +23,8 @@ import {
   IconButton,
   Stack,
   Typography,
-  // Input,
-  // Chip,
 } from '@mui/joy';
 import CloseIcon from '@mui/icons-material/Close';
-// import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export const AddContact = () => {
   const dispatch = useAppDispatch();

@@ -60,7 +60,6 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       sx={{
         p: 3,
         width: 400,
-        // height: 400,
         position: 'relative',
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -110,7 +109,7 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       {phones.map((phoneObj, index) => (
         <Box key={index}>
           <Typography>
-            Phone No. {index}: {phoneObj.phone}
+            Phone: {phoneObj.phone}
           </Typography>
         </Box>
       ))}
@@ -119,7 +118,7 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       {addresses.map((addressObj, index) => (
         <Box key={index}>
           <Typography>
-            Address {index}: {addressObj.address}
+            Address: {addressObj.address}
           </Typography>
         </Box>
       ))}
@@ -128,15 +127,15 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       {emails.map((emailObj, index) => (
         <Box key={index}>
           <Typography>
-            Email {index}: {emailObj.email}
+            Email: {emailObj.email}
           </Typography>
         </Box>
       ))}
 
-      {/* display categories*/}
+      {/* display categories */}
       {categories.map((categoryObj, index) => (
         <Box key={index}>
-          <Typography>Category: {categoryObj.category}</Typography>
+          <Typography>Categories: {categoryObj.category}</Typography>
         </Box>
       ))}
 

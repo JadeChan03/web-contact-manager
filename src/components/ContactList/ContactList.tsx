@@ -167,40 +167,44 @@ export const ContactList = () => {
   );
 
   return (
-    <Box>
-      <Box>
+      <Box sx={{padding: 2}}>
         {/* search bar */}
         <SearchContact searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <Box display={'flex'} gap={2} alignItems={'center'}>
-          <Box display={'flex'} gap={2} alignItems={'center'}>
-            {/* import files */}
-            <Typography> Import contacts </Typography>
-            <input type="file" accept=".vcf" onChange={handleImportContacts} />
+        <Box display={'flex'} gap={2} alignItems={'center'} sx={{marginTop:2}}>
+
+            {/* import contacts */}
+          <Box display={'flex'} gap={1} alignItems={'center'}>
+            <Typography level={'h4'}> Upload contacts: </Typography>
+            <input type="file" accept=".vcf" onChange={handleImportContacts} style={{borderRadius:'8px', padding:'4px'}} />
           </Box>
+
           {/* select all checkbox */}
-          <Typography> Select all</Typography>
+          <Box display="flex" gap={1} alignItems="center">
+          <Typography level={'h4'}> Select all: </Typography>
           <input
             type="checkbox"
             checked={selectedContacts.size === contacts.length}
             onChange={handleSelectAll}
           />
+          </Box>
+
           {/* actions */}
-          <Button variant="outlined" onClick={exportSelectedContacts}>
-            Export Selected
+          <Button variant="outlined" onClick={exportSelectedContacts} sx={{ borderRadius: '8px' }}>
+            Download selected
           </Button>
-          <Button variant="outlined" onClick={deleteSelectedContacts}>
+          <Button variant="outlined" onClick={deleteSelectedContacts} sx={{ borderRadius: '8px' }}>
             {' '}
-            Delete Selected
+            Delete selected
           </Button>
-        </Box>
       </Box>
 
       {/* grouped contacts by tags */}
       {Object.entries(groupedContacts).map(([tag, contactList]) => (
         <Box key={tag} marginTop={2}>
           <Typography level="h4">#{tag}</Typography>
-          <Box display={'flex'} gap={2}>
+          <Box display={'flex'} gap={2} sx={{ flexWrap: 'wrap' }}>
             {contactList.map(({ id }) => (
+              // TODO - implement ContactModal
               <ContactCard
                 id={id}
                 key={id}

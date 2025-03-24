@@ -11,7 +11,7 @@ const contactsSlice = createSlice({
     contactAdded: contactsAdapter.addOne,
     contactUpdated: contactsAdapter.updateOne,
     contactDeleted: contactsAdapter.removeOne,
-    contactsImported: contactsAdapter.upsertMany,
+    contactsImported: contactsAdapter.upsertMany, // not in use yet
   },
 });
 

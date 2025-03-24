@@ -97,7 +97,7 @@ export const importContactsFromVCard = (
           );
         });
 
-		console.log('Existing identifiers:', Array.from(existingIdentifiers));
+		// console.log('Existing identifiers:', Array.from(existingIdentifiers));
 
         importedContacts.forEach((importedContact) => {
           const identifiers = [
