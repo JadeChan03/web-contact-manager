@@ -1,8 +1,6 @@
 import { IconButton } from '@mui/joy';
-// import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-// import { nanoid } from 'nanoid';
 import {
   type Contact,
   Phone,
@@ -12,7 +10,6 @@ import {
   Tag,
 } from '../../types/contactTypes';
 type ContactField = keyof Contact;
-// type ContactInput = Contact[ContactField];
 
 import { UseFieldArrayRemove, UseFieldArrayAppend } from 'react-hook-form';
 import React from 'react';

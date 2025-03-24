@@ -97,11 +97,13 @@ export const importContactsFromVCard = (
           );
         });
 
-		// console.log('Existing identifiers:', Array.from(existingIdentifiers));
+        // console.log('Existing identifiers:', Array.from(existingIdentifiers));
 
         importedContacts.forEach((importedContact) => {
           const identifiers = [
-            ...importedContact.emails.map((email) => email.email.toLowerCase().trim()),
+            ...importedContact.emails.map((email) =>
+              email.email.toLowerCase().trim()
+            ),
             ...importedContact.phones.map((phone) => phone.phone.trim()),
           ];
 
@@ -133,8 +135,9 @@ export const importContactsFromVCard = (
 };
 
 export const parseVCard = (vcardData: string): Contact[] => {
-  console.log('vcardData on import !!! ', vcardData);
+  // console.log('vcardData on import !!! ', vcardData);
 
+  // helper function to decode URI component
   const decodeValue = (value: string) => {
     try {
       return decodeURIComponent(value);
@@ -162,8 +165,8 @@ export const parseVCard = (vcardData: string): Contact[] => {
       tags: [],
     };
 
+    // split and parse each line
     const lines = vcard.split('\n').map((line) => line.trim());
-
     lines.forEach((line) => {
       if (line.startsWith('N;')) {
         const nameParts = line.split(':')[1].split(';');
@@ -222,7 +225,7 @@ export const parseVCard = (vcardData: string): Contact[] => {
       }
     });
 
-    // only add the contact if there's meaningful information
+    // only add the contact if there's meaningful info
     if (contact.firstName || contact.lastName || contact.phones.length > 0) {
       contacts.push(contact);
     }

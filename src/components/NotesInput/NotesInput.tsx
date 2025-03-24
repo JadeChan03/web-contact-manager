@@ -24,7 +24,6 @@ export const NotesInput: React.FunctionComponent<NotesInputProps> = ({
   const notesValue = watch('notes') || '';
   // local 'notes' input value state, neccesarry for rendering current input in component
   const [localNotes, setLocalNotes] = useState(notesValue);
-
   // console.log('localNotes ', localNotes);
   // console.log('notesValue ', notesValue);
 

@@ -31,6 +31,7 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
   const countryCodeData: countryCodeData[] = useCountryCodeData();
   const [displayValue, setDisplayValue] = useState('');
 
+  // ensure form phone value displays national number format
   useEffect(() => {
     if (phoneValue) {
       const phoneNumber = parsePhoneNumber(
@@ -63,6 +64,7 @@ export const PhoneInput: React.FunctionComponent<PhoneInputProps> = ({
       inputValue,
       selectedCountryCode as CountryCode
     );
+    // quick fix: only allow users to add phone value after country code has been selected
     if (selectedCountryCode) {
       if (phoneNumber && phoneNumber.isValid()) {
         setDisplayValue(inputValue);
