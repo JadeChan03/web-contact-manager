@@ -62,7 +62,7 @@ export const exportContactsToVCard = (contacts: Contact[]) => {
     })
     .join('\n');
   // combine all contacts into single vcard file
-  console.log('downloaded ', vcards);
+  // console.log('downloaded ', vcards);
   const blob = new Blob([vcards], { type: 'text/vcard' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);

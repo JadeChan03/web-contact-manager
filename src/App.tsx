@@ -1,4 +1,4 @@
-import './App.css';
+// import './App.css';
 import { Home } from './pages/Home/Home';
 import { EditContact } from './components/EditContact/EditContact';
 import { AddContact } from './components/AddContact/AddContact';

@@ -140,8 +140,8 @@ export const ContactCard: React.FunctionComponent<ContactCardProps> = ({
       ))}
 
       {/* display organisation, website, notes, tags */}
-      <Typography sx={{ mb: 1 }}>Organisation: {organisation}</Typography>
-      <Typography sx={{ mb: 1 }}>Website: {webUrl}</Typography>
+      <Typography sx={{ mb: 1 }}>Organisation: {organisation === "N/A" ? "" : organisation}</Typography>
+      <Typography sx={{ mb: 1 }}>Website: {webUrl === "N/A" ? "" : webUrl}</Typography>
       <Typography sx={{ mb: 1 }}>Notes: {notes}</Typography>
       {/* display tags*/}
       <Box display={'flex'} alignItems={'center'} gap={1}>

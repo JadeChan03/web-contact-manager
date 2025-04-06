@@ -5,6 +5,7 @@ import {
   selectContacts,
   contactDeleted,
   contactAdded,
+  contactUpdated
 } from '../../redux/slices/contactsSlice';
 import { Box, Typography, Button } from '@mui/joy';
 import { useState } from 'react';
@@ -12,6 +13,7 @@ import {
   exportContactsToVCard,
   importContactsFromVCard,
 } from '../../utils/vcard';
+import { Contact } from '../../types/contactTypes';
 
 export const ContactList = () => {
   const contacts = useAppSelector(selectContacts);
@@ -82,19 +84,21 @@ export const ContactList = () => {
         existingContacts
       );
 
-      // handle added contacts
-      added.forEach((contact) => {
+       // handle added contacts
+       added.forEach((contact) => {
         dispatch(contactAdded(contact));
       });
 
       // handle updated contacts
-      // TODO - fix bug, updated contacts still renders new contact card
       for (const contact of updated) {
         const shouldUpdate = window.confirm(
           `Contact ${contact.firstName} ${contact.lastName} already exists. Do you want to update it?`
         );
         if (shouldUpdate) {
-          dispatch(contactAdded(contact)); // update existing contact
+          // select id of contact with same name
+          const { id } = contacts.find((c) => (c.firstName === contact.firstName && c.lastName === contact.lastName)) as Contact
+          // console.log('id ', id);
+          dispatch(contactUpdated({changes: contact, id})); // update existing contact
         }
       }
 
@@ -108,6 +112,10 @@ export const ContactList = () => {
       alert(
         `Import complete: ${added.length} added, ${updated.length} updated, ${skipped.length} skipped.`
       );
+
+      // reset input field
+      e.target.value = "";
+
     } catch (error) {
       console.error('Error importing contacts: ', error);
       alert('Error importing contacts: ' + error);

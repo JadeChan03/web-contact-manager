@@ -1,8 +1,8 @@
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { nanoid } from '@reduxjs/toolkit';
-import { contactAdded } from '../../redux/slices/contactsSlice';
+import { contactAdded, contactUpdated, selectContacts } from '../../redux/slices/contactsSlice';
 import {
   Contact,
   Phone,
@@ -27,6 +27,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 
 export const AddContact = () => {
+  const contacts = useAppSelector(selectContacts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // states for disabling add/remove field buttonss
@@ -89,7 +90,18 @@ export const AddContact = () => {
     const newContact = {
       ...data,
     };
-    dispatch(contactAdded(newContact));
+
+    // check for duplicate
+    const duplicate = contacts.find((c) => (c.firstName === newContact.firstName && c.lastName === newContact.lastName)) 
+    if (duplicate) {
+      const { id } = duplicate;
+      // update existing contact
+      dispatch(contactUpdated({changes: newContact, id}));
+    } else {
+      // else add new contact
+      dispatch(contactAdded(newContact));
+    }
+
     reset();
     navigate('/');
   };
