@@ -95,9 +95,8 @@ In src/redux/types.ts, types are defined for the Redux store, dispatch, and the 
 
 ### Implement Contact Modal
 
-- in the interest of time ContactModal has **not** been implemented, as such this criteria is not fully met:
-  "The UI must display Contacts as cards, and once opened The UI should display a Form to Visualize, Edit or Delete the Contact." However, ContactCards are directly visualed on ContactList and have the ability to be deleted, edited, or selected.
-
+- in the interest of time ContactModal has **not** been implemented. original plan is for UI should display Contacts as cards, and once opened the UI should display a form to Visualize, Edit or Delete the Contact
+  
 ### UI
 
 - Handling and visualisation of undefined tags not implemented
