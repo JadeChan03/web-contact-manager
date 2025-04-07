@@ -98,11 +98,6 @@ In src/redux/types.ts, types are defined for the Redux store, dispatch, and the 
 - in the interest of time ContactModal has **not** been implemented, as such this criteria is not fully met:
   "The UI must display Contacts as cards, and once opened The UI should display a Form to Visualize, Edit or Delete the Contact." However, ContactCards are directly visualed on ContactList and have the ability to be deleted, edited, or selected.
 
-### VCard/Import/Export Functionality
-
-- vCard Import Duplicate Bug: The logic to check for duplicates is implemented, but the UI still renders duplicate cards in importContactsFromVCard in vcard.ts.
-- Manual Addition Duplicates: The app renders duplicate contact cards when new contacts are manually added.
-
 ### UI
 
 - Handling and visualisation of undefined tags not implemented
